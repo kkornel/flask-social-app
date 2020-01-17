@@ -1,0 +1,4 @@
+1) When we use this forms we need to set a secret key for our application.
+It will protect against modyfing cookies, and CRSF attacks etc.
+We set this in 'flaskblog.py' app.config[]
+
