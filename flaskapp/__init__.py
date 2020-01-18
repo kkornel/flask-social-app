@@ -1,5 +1,7 @@
 from flask import Flask
 
+from flask_bcrypt import Bcrypt
+from flask_login import LoginManager
 from flask_sqlalchemy import SQLAlchemy
 
 from flaskapp.config import Config
@@ -26,17 +28,36 @@ from flaskapp.config import Config
 db = SQLAlchemy()
 # db = SQLAlchemy(app)
 
+bcrypt = Bcrypt()
+# bcrypt = Bcrypt(app)
+
+login_manager = LoginManager()
+# login_manager = LoginManager(app)
+
+# It tells the login_manager where is login route.
+# @login_required needs to know where to redirect user
+# if he is not logged in.
+login_manager.login_view = 'users.login'
+
+# Styling the flash message for @login_required that pops up on login page.
+login_manager.login_message_category = 'info'
+
 
 def create_app(config_class=Config):
     app = Flask(__name__)
     app.config.from_object(config_class)
 
     db.init_app(app)
+    bcrypt.init_app(app)
+    login_manager.init_app(app)
 
     from flaskapp.main.routes import main
     from flaskapp.users.routes import users
 
     app.register_blueprint(main)
     app.register_blueprint(users)
+
+    with app.app_context():
+        db.create_all()
 
     return app

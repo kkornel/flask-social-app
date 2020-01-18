@@ -8,8 +8,8 @@ from flaskapp.models import User
 # When we use this forms we need to set a secret key for our application.
 # It will protect against modyfing cookies, and CRSF attacks etc.
 # We set this in 'flaskblog.py' app.config[]
-# If we do not specify secret key, we get error while
-# visiting page with tag: {{ form.hidden_tag() }}
+# If we do not specify secret key, we will get error
+# while visiting page with tag: {{ form.hidden_tag() }}
 
 
 class RegistrationForm(FlaskForm):

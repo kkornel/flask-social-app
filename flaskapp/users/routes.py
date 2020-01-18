@@ -1,6 +1,7 @@
-from flask import Blueprint, flash, redirect, render_template, request
+from flask import Blueprint, current_app, flash, redirect, render_template, request, url_for
+from flask_login import current_user, login_user, logout_user, login_required
 
-from flaskapp import db
+from flaskapp import db, bcrypt
 from flaskapp.models import User
 from flaskapp.users.forms import LoginForm, RegistrationForm
 
@@ -14,7 +15,22 @@ users = Blueprint('users', __name__)
 
 @users.route('/register', methods=['GET', 'POST'])
 def register():
+    if current_user.is_authenticated:
+        return redirect(url_for('main.home'))
     form = RegistrationForm()
+    if form.validate_on_submit():
+        # bcrypt.generate_password_hash(form.password.data) - returns bytes
+        # bcrypt.generate_password_hash(form.password.data).decode('utf-8') - returns string
+        hashed_password = bcrypt.generate_password_hash(
+            form.password.data).decode('utf-8')
+        user = User(email=form.email.data,
+                    username=form.username.data, password=hashed_password)
+        db.session.add(user)
+        db.session.commit()
+        current_app.logger.info('%s logged in successfully', user)
+        # 'success' is the name of the BootStrap class for message.
+        flash(f'Your account has been created! You are now able to log in', 'success')
+        return redirect(url_for('users.login'))
     return render_template('register.html', title='Register', form=form)
 
 

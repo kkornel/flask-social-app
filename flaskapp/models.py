@@ -21,7 +21,8 @@ class User(db.Model, UserMixin):
     image = db.Column(db.String(20), nullable=False, default='default.jpg')
 
     def __repr__(self):
-        return f"User('{self.id}, {self.email}',{self.username}', '{self.password}', '{self.image_file})"
+        return f"User({self.id}, '{self.email}', '{self.username}', '{self.password}', '{self.image}')"
 
     def __str__(self):
-        return f"User('{self.id}, {self.email}', '{self.image_file}')"
+        # return f"User({self.id}, '{self.email}', '{self.image}')"
+        return f"User({self.id}, '{self.email}', '{self.username}', '{self.password}', '{self.image}')"
