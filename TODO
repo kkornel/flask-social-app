@@ -4,3 +4,5 @@ Todo:
 
 Consider:
   ☐ Highlighting active links in nav bar.
+  ☐ Remove secret key and show error while visiting page with {{ form.hidden_tag() }}
+  ☐ 

@@ -11,7 +11,7 @@ import os
 class Config:
     DEBUG = False
     # This should also be enviroment variable.
-    # SECRET_KEY = '6107238231997648b4a5a6290e590fde'
+    SECRET_KEY = '046e22b94eeaa82d1a6d721f0da941ec'
     # This should also be enviroment variable.
     # SQLALCHEMY_DATABASE_URI = 'sqlite:///site.db'
     # MAIL_SERVER = 'smtp.googlemail.com'
