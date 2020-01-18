@@ -3,6 +3,7 @@ from flask import Flask
 from flask_bcrypt import Bcrypt
 from flask_login import LoginManager
 from flask_sqlalchemy import SQLAlchemy
+from flask_mail import Mail
 
 from flaskapp.config import Config
 
@@ -34,6 +35,9 @@ bcrypt = Bcrypt()
 login_manager = LoginManager()
 # login_manager = LoginManager(app)
 
+mail = Mail()
+# mail = Mail(app)
+
 # It tells the login_manager where is login route.
 # @login_required needs to know where to redirect user
 # if he is not logged in.
@@ -41,6 +45,37 @@ login_manager.login_view = 'users.login'
 
 # Styling the flash message for @login_required that pops up on login page.
 login_manager.login_message_category = 'info'
+
+# app.config['MAIL_SERVER'] = 'smtp.googlemail.com'
+# app.config['MAIL_PORT'] = 587
+# app.config['MAIL_USE_TLS'] = True
+# app.config['MAIL_USERNAME'] = os.environ.get('EMAIL_USER')
+# app.config['MAIL_PASSWORD'] = os.environ.get('EMAIL_PASS')
+
+# It needs to be here, becuase in routes.py we are importing app and
+# if that import below would be at the top, the app from routes would give an importing error.
+# Because it would want to import app that would not yet exist.
+
+# After Blueprints we do not need that.
+# from flaskblog import routes
+
+# from flaskblog.main.routes import main
+# from flaskblog.users.routes import users
+# from flaskblog.posts.routes import posts
+
+# app.register_blueprint(main)
+# app.register_blueprint(users)
+# app.register_blueprint(posts)
+
+# After moving config to config.py
+# Everything except the extensions is moved here.
+# The reason why we do not move extentions to the functions is
+# we want them to be created outside of the function, but we still
+# want to initialize these extenstions inside of the function with the application.
+# Flask documentation:
+# This is so that the extension object does not initially get bound to the application
+# Using this design patter no application specific state is stored on the extension object
+# so one extension object can be used for multiple apps.
 
 
 def create_app(config_class=Config):
@@ -50,12 +85,17 @@ def create_app(config_class=Config):
     db.init_app(app)
     bcrypt.init_app(app)
     login_manager.init_app(app)
+    mail.init_app(app)
 
     from flaskapp.main.routes import main
     from flaskapp.users.routes import users
+    # from flaskblog.posts.routes import posts
+    # from flaskblog.errors.handlers import errors
 
     app.register_blueprint(main)
     app.register_blueprint(users)
+    # app.register_blueprint(posts)
+    # app.register_blueprint(errors)
 
     with app.app_context():
         db.create_all()

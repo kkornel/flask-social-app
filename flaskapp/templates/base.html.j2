@@ -29,29 +29,27 @@
       <div class="collapse navbar-collapse" id="navbarText">
         <ul class="navbar-nav mr-auto">
           <li class="nav-item">
-            <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
+            <a class="nav-link" href="{{ url_for('main.home') }}">Home</a>
           </li>
           <li class="nav-item">
             <a class="nav-link" href="#">Features</a>
           </li>
         </ul>
         <ul class="navbar-nav">
-          {# 
+           
           {% if current_user.is_authenticated %} 
-          #}
-          {% if 1==0 %}
             <li class="nav-item">
-              <a class="nav-link" href="#">Account</a>
+              <a class="nav-link" href="{{ url_for('users.profile') }}">Profile</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="#">Logout</a>
+              <a class="nav-link" href="{{ url_for('users.logout') }}">Logout</a>
             </li>
           {% else %}
             <li class="nav-item">
-              <a class="nav-link" href="#">Register</a>
+              <a class="nav-link" href="{{ url_for('users.register') }}">Register</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="#">Login</a>
+              <a class="nav-link" href="{{ url_for('users.login') }}">Login</a>
             </li>
           {% endif %}
         </ul>

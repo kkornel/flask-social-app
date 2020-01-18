@@ -1,8 +1,12 @@
 
 Todo:
   ☐ Custom password validator.
+  ☐ reCaptcha.
+  ☐ Email activation link.
+  ☐ Change password in profile.
+  ☐ Not required fields in profile for password only, propably.
 
-Consider:
+  Consider:
   ☐ Highlighting active links in nav bar.
   ☐ Remove secret key and show error while visiting page with {{ form.hidden_tag() }}
   ☐ 

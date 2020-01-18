@@ -15,14 +15,14 @@ class Config:
     SECRET_KEY = os.environ.get('MT_FLASK_APP_SECRET_KEY')
     # This should also be enviroment variable.
     # SQLALCHEMY_DATABASE_URI = 'sqlite:///site.db'
-    SQLALCHEMY_DATABASE_URI = 'postgresql://postgres:postgres@localhost/mt_flask_app'
-    # SQLALCHEMY_DATABASE_URI = os.environ.get(
-    #     'MT_FLASK_SQLALCHEMY_DATABASE_URI')
-    # MAIL_SERVER = 'smtp.googlemail.com'
-    # MAIL_PORT = 587
-    # MAIL_USE_TLS = True
-    # MAIL_USERNAME = os.environ.get('EMAIL_USER')
-    # MAIL_PASSWORD = os.environ.get('EMAIL_PASS')
+    # SQLALCHEMY_DATABASE_URI = 'postgresql://postgres:postgres@localhost/mt_flask_app'
+    SQLALCHEMY_DATABASE_URI = os.environ.get(
+        'MT_FLASK_SQLALCHEMY_DATABASE_URI')
+    MAIL_SERVER = 'smtp.googlemail.com'
+    MAIL_PORT = 587
+    MAIL_USE_TLS = True
+    MAIL_USERNAME = os.environ.get('EMAIL_USER')
+    MAIL_PASSWORD = os.environ.get('EMAIL_PASS')
 
 
 class DevelopmentConfig(Config):
