@@ -124,5 +124,5 @@ def profile():
         form.username.data = current_user.username
         form.email.data = current_user.email
     image = url_for(
-        'static', filename=f'profile_pics/{current_user.image}')
+        'static', filename=f'profile_imgs/{current_user.image}')
     return render_template('profile.html', title='Profile', image=image, form=form)
