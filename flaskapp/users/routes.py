@@ -35,7 +35,7 @@ def register():
         flash(
             f'A confirmation email has been sent to {form.email.data}', 'success')
         return redirect(url_for('users.login'))
-    return render_template('register.html', title='Register', form=form)
+    return render_template('users/register.html', title='Register', form=form)
 
 
 @users.route('/confirm/<token>')
@@ -64,7 +64,7 @@ def login():
         if user and bcrypt.check_password_hash(user.password, form.password.data):
             if not user.active:
                 flash('In order to log in please confirm your account!', 'warning')
-                return render_template('login.html', title='Login', form=form)
+                return render_template('users/login.html', title='Login', form=form)
             # remember refers to the Remember me on Login page.
             login_user(user, remember=form.remember.data)
             # When we try to access a page that requires login, eg. account page.
@@ -77,7 +77,7 @@ def login():
             return redirect(next_page) if next_page else redirect(url_for('main.home'))
         else:
             flash('Login Unsuccessful. Please check email and password.', 'danger')
-    return render_template('login.html', title='Login', form=form)
+    return render_template('users/login.html', title='Login', form=form)
 
 
 @users.route('/logout')
@@ -96,7 +96,7 @@ def reset_password_request():
         send_reset_password_email(user)
         flash('An email has been sent with instructions to reset your password.', 'info')
         return redirect(url_for('users.login'))
-    return render_template('reset_password_request.html', title='Reset Password', form=form)
+    return render_template('users/reset_password_request.html', title='Reset Password', form=form)
 
 
 @users.route('/reset_password/<token>', methods=['GET', 'POST'])
@@ -116,7 +116,7 @@ def reset_password_token(token):
         db.session.commit()
         flash('Your password has been updated! You are now able to log in.', 'success')
         return redirect(url_for('users.login'))
-    return render_template('reset_password_token.html', title='Set New Password', form=form)
+    return render_template('users/reset_password_token.html', title='Set New Password', form=form)
 
 
 @users.route('/profile', methods=['GET', 'POST'])
@@ -150,4 +150,4 @@ def profile():
         form.email.data = current_user.email
     image = url_for(
         'static', filename=f'profile_imgs/{current_user.image}')
-    return render_template('profile.html', title='Profile', image=image, form=form)
+    return render_template('users/profile.html', title='Profile', image=image, form=form)
