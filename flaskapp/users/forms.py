@@ -1,5 +1,6 @@
 from flask import Markup
 
+from flask_login import current_user
 from flask_wtf import FlaskForm, RecaptchaField, Recaptcha
 from flask_wtf.file import FileField, FileAllowed
 from wtforms import BooleanField, PasswordField, StringField, SubmitField
@@ -96,12 +97,12 @@ class ResetPasswordForm(FlaskForm):
 
 
 class UpdateProfileForm(FlaskForm):
-    email = StringField('Email', validators=[DataRequired(), Email()])
+    email = StringField('Email', validators=[Email()])
     username = StringField('Username',
-                           validators=[DataRequired(), Length(min=4, max=15)])
-    password = PasswordField('New Password', validators=[DataRequired()])
+                           validators=[Length(min=4, max=15)])
+    password = PasswordField('New Password')
     confirm_password = PasswordField('Confirm Password',
-                                     validators=[DataRequired(), EqualTo('password')])
+                                     validators=[EqualTo('password')])
     image = FileField('Update Profile Image',
                       validators=[FileAllowed(['jpg', 'png'])])
     submit = SubmitField('Update Profile')
@@ -113,15 +114,17 @@ class UpdateProfileForm(FlaskForm):
 
     def validate_email(self, email):
         user = User.query.filter_by(email=email.data).first()
-        if user:
+        if user and current_user.email != user.email:
             raise ValidationError('That email is already in use.')
 
     def validate_username(self, username):
         user = User.query.filter_by(username=username.data).first()
-        if user:
+        if user and current_user.username != user.username:
             raise ValidationError('That username is already in use.')
 
     def validate_password(self, password):
+        if password.data == '':
+            return
         is_password_strong = check_password_strength(password.data)
         if not is_password_strong:
             raise ValidationError('''Password must be:

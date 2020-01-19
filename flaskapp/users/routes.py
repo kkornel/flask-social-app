@@ -130,7 +130,10 @@ def profile():
             current_user.image = image_fn
         current_user.username = form.username.data
         current_user.email = form.email.data
-        # db.session.commit()
+        hashed_password = bcrypt.generate_password_hash(
+            form.password.data).decode('utf-8')
+        current_user.password = hashed_password
+        db.session.commit()
         flash('Your account has been updated!', 'success')
         # You want to use redirect here instead of fall down to render_template
         # and the reason is of something called Post-Get-Redirect-Pattern

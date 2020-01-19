@@ -56,7 +56,7 @@ class User(db.Model, UserMixin):
     #     return s.dumps({'user_id': self.id}).decode('utf-8')
 
     def get_token(self, expires_in, salt):
-         """
+        """
         This creates a token needed to reset password via email.
         Token is created using app's secret key.
         He has expiration time. Default 30 mins.
