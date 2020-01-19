@@ -1,11 +1,12 @@
 from flask import Markup
 
-from flask_wtf import FlaskForm
+from flask_wtf import FlaskForm, RecaptchaField, Recaptcha
 from flask_wtf.file import FileField, FileAllowed
 from wtforms import BooleanField, PasswordField, StringField, SubmitField
 from wtforms.validators import DataRequired, Email, EqualTo, Length, ValidationError
 
 from flaskapp.models import User
+from flaskapp.users.utils import check_password_strength
 
 # When we use this forms we need to set a secret key for our application.
 # It will protect against modyfing cookies, and CRSF attacks etc.
@@ -21,6 +22,8 @@ class RegistrationForm(FlaskForm):
     password = PasswordField('Password', validators=[DataRequired()])
     confirm_password = PasswordField('Confirm Password',
                                      validators=[DataRequired(), EqualTo('password')])
+    recaptcha = RecaptchaField(
+        validators=[Recaptcha(message="Check the reCaptcha field.")])
     submit = SubmitField('Sign Up')
 
     # Validation has to be in form:
@@ -39,6 +42,16 @@ class RegistrationForm(FlaskForm):
         user = User.query.filter_by(username=username.data).first()
         if user:
             raise ValidationError('That username is already in use.')
+
+    def validate_password(self, password):
+        is_password_strong = check_password_strength(password.data)
+        if not is_password_strong:
+            raise ValidationError('''Password must be:
+                                  at least 8 chars long and has at least:
+                                  1 digit
+                                  1 symbol
+                                  1 uppercase letter
+                                  1 lowercase letter''')
 
 
 class LoginForm(FlaskForm):
@@ -69,6 +82,16 @@ class ResetPasswordForm(FlaskForm):
                                      validators=[DataRequired(), EqualTo('password')])
     submit = SubmitField('Reset Password')
 
+    def validate_password(self, password):
+        is_password_strong = check_password_strength(password.data)
+        if not is_password_strong:
+            raise ValidationError('''Password must be:
+                                  at least 8 chars long and has at least:
+                                  1 digit
+                                  1 symbol
+                                  1 uppercase letter
+                                  1 lowercase letter''')
+
 
 class UpdateProfileForm(FlaskForm):
     email = StringField('Email', validators=[DataRequired(), Email()])
@@ -95,3 +118,13 @@ class UpdateProfileForm(FlaskForm):
         user = User.query.filter_by(username=username.data).first()
         if user:
             raise ValidationError('That username is already in use.')
+
+    def validate_password(self, password):
+        is_password_strong = check_password_strength(password.data)
+        if not is_password_strong:
+            raise ValidationError('''Password must be:
+                                  at least 8 chars long and has at least:
+                                  1 digit
+                                  1 symbol
+                                  1 uppercase letter
+                                  1 lowercase letter''')

@@ -1,6 +1,6 @@
 
 Todo:
-  ☐ Custom password validator.
+  ✔ Custom password validator. @done(20-01-19 10:48)
   ☐ reCaptcha.
   ☐ Email activation link.
   ☐ Change password in profile.

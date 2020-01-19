@@ -22,7 +22,7 @@
                 #}
                 {% if form.email.errors %}
                 {{ form.email(class="form-control form-control-lg is-invalid") }}
-                <div clas="invalid-feedback">
+                <div class="invalid-feedback">
 
                     {% for error in form.email.errors %}
                     <span>{{ error }}</span>
@@ -41,7 +41,7 @@
 
                 {% if form.username.errors %}
                 {{ form.username(class="form-control form-control-lg is-invalid") }}
-                <div clas="invalid-feedback">
+                <div class="invalid-feedback">
 
                     {% for error in form.username.errors %}
                     <span>{{ error }}</span>
@@ -84,7 +84,19 @@
                 {{ form.confirm_password(class="form-control form-control-lg") }}
                 {% endif %}
             </div>
-            <div class="form-group text-center">
+            <div class="form-group row align-items-center justify-content-center">
+                {{ form.recaptcha}}
+                {% if form.recaptcha.errors %}
+                <div class="invalid-feedback d-block text-center">
+
+                    {% for error in form.recaptcha.errors %}
+                    <span> {{ error }}</span>
+                    {% endfor %}
+
+                </div>
+                {% endif %}
+            </div>
+            <div class="form-group text-center mt-4">
                 <div class="form-group mb-3">
                     {{ form.submit(class="btn btn-dark") }}
                 </div>
