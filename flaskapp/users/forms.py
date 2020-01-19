@@ -67,6 +67,8 @@ class LoginForm(FlaskForm):
 class RequestPasswordResetForm(FlaskForm):
     email = StringField('Email',
                         validators=[DataRequired(), Email()])
+    recaptcha = RecaptchaField(
+        validators=[Recaptcha(message="Check the reCaptcha field.")])
     submit = SubmitField('Request Pasword Reset')
 
     def validate_email(self, email):
