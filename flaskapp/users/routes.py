@@ -4,7 +4,7 @@ from flask_login import current_user, login_user, logout_user, login_required
 from flaskapp import db, bcrypt
 from flaskapp.models import User
 from flaskapp.users.forms import LoginForm, RegistrationForm, RequestPasswordResetForm, ResetPasswordForm, UpdateProfileForm
-from flaskapp.users.utils import send_reset_password_email, save_image
+from flaskapp.users.utils import send_reset_password_email, save_image, send_verification_email
 
 
 users = Blueprint('users', __name__)
@@ -26,14 +26,32 @@ def register():
         hashed_password = bcrypt.generate_password_hash(
             form.password.data).decode('utf-8')
         user = User(email=form.email.data,
-                    username=form.username.data, password=hashed_password)
+                    username=form.username.data,
+                    password=hashed_password)
         db.session.add(user)
         db.session.commit()
+        send_verification_email(user)
         # 'success' is the name of the BootStrap class for message.
         flash(
-            f'Account for {form.email.data} has been created! You are now able to log in', 'success')
+            f'A confirmation email has been sent to {form.email.data}', 'success')
         return redirect(url_for('users.login'))
     return render_template('register.html', title='Register', form=form)
+
+
+@users.route('/confirm/<token>')
+def confirm_email(token):
+    user = User.verify_token(
+        token, current_app.config['SECURITY_VERIFY_EMAIL_SALT'])
+    if user is None:
+        flash('That is an invalid or expired token', 'warning')
+    elif user.active:
+        flash('Account already confirmed. Please login.', 'success')
+    else:
+        user.active = True
+        db.session.add(user)
+        db.session.commit()
+        flash('You have confirmed your account. You can log in now.', 'success')
+    return redirect(url_for('users.login'))
 
 
 @users.route('/login', methods=['GET', 'POST'])
@@ -44,6 +62,9 @@ def login():
     if form.validate_on_submit():
         user = User.query.filter_by(email=form.email.data).first()
         if user and bcrypt.check_password_hash(user.password, form.password.data):
+            if not user.active:
+                flash('In order to log in please confirm your account!', 'warning')
+                return render_template('login.html', title='Login', form=form)
             # remember refers to the Remember me on Login page.
             login_user(user, remember=form.remember.data)
             # When we try to access a page that requires login, eg. account page.
@@ -82,7 +103,8 @@ def reset_password_request():
 def reset_password_token(token):
     if current_user.is_authenticated:
         return redirect(url_for('main.home'))
-    user = User.verify_reset_password_token(token)
+    user = User.verify_token(
+        token, current_app.config['SECURITY_RESET_PASSWORD_SALT'])
     if user is None:
         flash('That is an invalid or expired token', 'warning')
         return redirect(url_for('users.reset_request'))

@@ -33,6 +33,7 @@ class User(db.Model, UserMixin):
     password = db.Column(db.String(60), nullable=False)
     # Users have to have at least default img, so nullable=False.
     image = db.Column(db.String(20), nullable=False, default='default.jpg')
+    active = db.Column(db.Boolean, nullable=False, default=False)
 
     def get_reset_password_token(self, expires_sec=1800):
         """This creates a token needed to reset password via email.
@@ -47,12 +48,58 @@ class User(db.Model, UserMixin):
         s = Serializer(current_app.config['SECRET_KEY'], expires_sec)
         return s.dumps({'user_id': self.id}).decode('utf-8')
 
+    def get_activaction_token(self):
+        """Almost the same as get_reset_password_token(), but
+        expires_in is set to None
+        """
+        s = Serializer(current_app.config['SECRET_KEY'])
+        return s.dumps({'user_id': self.id}).decode('utf-8')
+
+    def get_token(self, expires_in, salt):
+        """
+        https://pythonhosted.org/itsdangerous/
+
+        All classes also accept a salt argument. The name might be misleading 
+        because usually if you think of salts in cryptography 
+        you would expect the salt to be something that is stored 
+        alongside the resulting signed string as a way 
+        to prevent rainbow table lookups. 
+        Such salts are usually public.
+
+        In “itsdangerous”, like in the original Django implementation, 
+        the salt serves a different purpose. 
+        You could describe it as namespacing. 
+        It’s still not critical if you disclose 
+        it because without the secret key it does not help an attacker.
+
+        Let’s assume that you have two links you want to sign. 
+        You have the activation link on your system 
+        which can activate a user account and then 
+        you have an upgrade link that can upgrade 
+        a user’s account to a paid account which you send out via email. 
+        If in both cases all you sign is the user ID a user could reuse 
+        the variable part in the URL from the activation link 
+        to upgrade the account.
+        """
+        s = Serializer(current_app.config['SECRET_KEY'], expires_in)
+        current_app.logger.info('Serializer: %s', s)
+        return s.dumps({'user_id': self.id}, salt=salt).decode('utf-8')
+
     # @staticmethod tells python not to except a self parameter as a argument
     @staticmethod
     def verify_reset_password_token(token):
         s = Serializer(current_app.config['SECRET_KEY'])
         try:
             user_id = s.loads(token)['user_id']
+        except:
+            return None
+        return User.query.get(user_id)
+
+    @staticmethod
+    def verify_token(token, salt):
+        s = Serializer(current_app.config['SECRET_KEY'])
+        try:
+            user_id = s.loads(token, salt=salt)['user_id']
         except:
             return None
         return User.query.get(user_id)

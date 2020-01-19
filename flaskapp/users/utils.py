@@ -3,7 +3,7 @@ import secrets
 import re
 
 from PIL import Image
-from flask import url_for, current_app
+from flask import url_for, current_app, render_template
 from flask_mail import Message
 
 from flaskapp import mail
@@ -61,13 +61,34 @@ def save_image(form_image):
 
 
 def send_reset_password_email(user):
-    token = user.get_reset_password_token()
-    msg = Message('Password Reset Request',
-                  sender='noreply@demo.com',
-                  recipients=[user.email])
-    msg.body = f'''To reset your password, visit the following link: 
-{url_for('users.reset_password_token', token=token, _external=True)}
+    token = user.get_token(3600,
+                           current_app.config['SECURITY_RESET_PASSWORD_SALT'])
+    reset_url = url_for('users.reset_password_token',
+                        token=token,
+                        _external=True)
+    html = render_template('users/mail_reset_password.html',
+                           reset_url=reset_url)
+    subject = 'Password Reset Request'
+    send_email(user.email, subject, html)
 
-If you did not make this request then simply ignore this email and no changes will be made.
-'''
+
+def send_verification_email(user):
+    token = user.get_token(None,
+                           current_app.config['SECURITY_VERIFY_EMAIL_SALT'])
+    confirm_url = url_for('users.confirm_email',
+                          token=token,
+                          _external=True)
+    html = render_template('users/mail_verify_email.html',
+                           confirm_url=confirm_url)
+    subject = 'Please confirm your email'
+    send_email(user.email, subject, html)
+
+
+def send_email(to, subject, template):
+    msg = Message(
+        subject,
+        recipients=[to],
+        html=template,
+        sender=current_app.config['MAIL_DEFAULT_SENDER']
+    )
     mail.send(msg)

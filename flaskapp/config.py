@@ -23,9 +23,13 @@ class Config:
     MAIL_USE_TLS = True
     MAIL_USERNAME = os.environ.get('EMAIL_USER')
     MAIL_PASSWORD = os.environ.get('EMAIL_PASS')
+    MAIL_DEFAULT_SENDER = 'noreply@demo.com'
     RECAPTCHA_PUBLIC_KEY = os.environ.get('RECAPTCHA_PUBLIC_KEY')
     RECAPTCHA_PRIVATE_KEY = os.environ.get('RECAPTCHA_PRIVATE_KEY')
     # RECAPTCHA_DATA_ATTRS = {'theme': 'dark'}
+    # To environ
+    SECURITY_RESET_PASSWORD_SALT = 'cbcb788d1334901da4b846c6adce4f0f'
+    SECURITY_VERIFY_EMAIL_SALT = '75df285855af40a28eea4760bae29f58'
 
 
 class DevelopmentConfig(Config):
