@@ -35,9 +35,30 @@ class User(db.Model, UserMixin):
     image = db.Column(db.String(20), nullable=False, default='default.jpg')
     active = db.Column(db.Boolean, nullable=False, default=False)
 
-    def get_reset_password_token(self, expires_sec=1800):
-        """This creates a token needed to reset password via email.
-        Token is created using app's secret key. 
+    # def get_reset_password_token(self, expires_sec=1800):
+    #     """This creates a token needed to reset password via email.
+    #     Token is created using app's secret key.
+    #     He has expiration time. Default 30 mins.
+    #     After that we need to generate new token.
+    #     If token is valid (not expired) it returns:
+    #         {'user_id': 1}
+    #     Else:
+    #         Exception: itsdangerous.exc.SignatureExpired: Signature expired
+    #     """
+    #     s = Serializer(current_app.config['SECRET_KEY'], expires_sec)
+    #     return s.dumps({'user_id': self.id}).decode('utf-8')
+
+    # def get_activaction_token(self):
+    #     """Almost the same as get_reset_password_token(), but
+    #     expires_in is set to None
+    #     """
+    #     s = Serializer(current_app.config['SECRET_KEY'])
+    #     return s.dumps({'user_id': self.id}).decode('utf-8')
+
+    def get_token(self, expires_in, salt):
+         """
+        This creates a token needed to reset password via email.
+        Token is created using app's secret key.
         He has expiration time. Default 30 mins.
         After that we need to generate new token.
         If token is valid (not expired) it returns:
@@ -45,18 +66,10 @@ class User(db.Model, UserMixin):
         Else:
             Exception: itsdangerous.exc.SignatureExpired: Signature expired
         """
-        s = Serializer(current_app.config['SECRET_KEY'], expires_sec)
-        return s.dumps({'user_id': self.id}).decode('utf-8')
 
-    def get_activaction_token(self):
-        """Almost the same as get_reset_password_token(), but
-        expires_in is set to None
         """
-        s = Serializer(current_app.config['SECRET_KEY'])
-        return s.dumps({'user_id': self.id}).decode('utf-8')
+        Tha Salt
 
-    def get_token(self, expires_in, salt):
-        """
         https://pythonhosted.org/itsdangerous/
 
         All classes also accept a salt argument. The name might be misleading 
@@ -86,15 +99,16 @@ class User(db.Model, UserMixin):
         return s.dumps({'user_id': self.id}, salt=salt).decode('utf-8')
 
     # @staticmethod tells python not to except a self parameter as a argument
-    @staticmethod
-    def verify_reset_password_token(token):
-        s = Serializer(current_app.config['SECRET_KEY'])
-        try:
-            user_id = s.loads(token)['user_id']
-        except:
-            return None
-        return User.query.get(user_id)
+    # @staticmethod
+    # def verify_reset_password_token(token):
+    #     s = Serializer(current_app.config['SECRET_KEY'])
+    #     try:
+    #         user_id = s.loads(token)['user_id']
+    #     except:
+    #         return None
+    #     return User.query.get(user_id)
 
+    # @staticmethod tells python not to except a self parameter as a argument
     @staticmethod
     def verify_token(token, salt):
         s = Serializer(current_app.config['SECRET_KEY'])
