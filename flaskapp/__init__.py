@@ -7,6 +7,29 @@ from flask_mail import Mail
 
 from flaskapp.config import Config
 
+from logging.config import dictConfig
+
+dictConfig({
+    'version': 1,
+    'formatters': {
+        'default': {
+            'format':
+            '[%(levelname)s] [%(asctime)s] [%(name)s.%(funcName)s] ->  %(message)s',
+            'datefmt': '%H:%M:%S',
+        }
+    },
+    'handlers': {
+        'wsgi': {
+            'class': 'logging.StreamHandler',
+            'stream': 'ext://flask.logging.wsgi_errors_stream',
+            'formatter': 'default'
+        }
+    },
+    'root': {
+        'level': 'INFO',
+        'handlers': ['wsgi']
+    }
+})
 
 # __name__ - name of the module
 # If we run this, this will be equal __main__

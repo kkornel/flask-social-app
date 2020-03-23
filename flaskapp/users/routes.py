@@ -2,10 +2,9 @@ from flask import Blueprint, current_app, flash, redirect, render_template, requ
 from flask_login import current_user, login_user, logout_user, login_required
 
 from flaskapp import db, bcrypt
-from flaskapp.models import User
+from flaskapp.users.models import User, Profile
 from flaskapp.users.forms import LoginForm, RegistrationForm, RequestPasswordResetForm, ResetPasswordForm, UpdateProfileForm
-from flaskapp.users.utils import send_reset_password_email, save_image, send_verification_email
-
+from flaskapp.users.utils import save_image
 
 users = Blueprint('users', __name__)
 
@@ -14,7 +13,7 @@ users = Blueprint('users', __name__)
 # Instead we are going to create route specifically for this user's blueprint.
 # And then register these with the application later.
 
-
+from flask import current_app as app
 @users.route('/register', methods=['GET', 'POST'])
 def register():
     if current_user.is_authenticated:
@@ -25,12 +24,18 @@ def register():
         # bcrypt.generate_password_hash(form.password.data).decode('utf-8') - returns string
         hashed_password = bcrypt.generate_password_hash(
             form.password.data).decode('utf-8')
+
         user = User(email=form.email.data,
                     username=form.username.data,
                     password=hashed_password)
         db.session.add(user)
         db.session.commit()
-        send_verification_email(user)
+
+        profile = Profile(user_id=user.id, user=user)
+        db.session.add(profile)
+        db.session.commit()
+
+        user.send_verification_email()
         # 'success' is the name of the BootStrap class for message.
         flash(
             f'A confirmation email has been sent to {form.email.data}', 'success')
@@ -93,7 +98,7 @@ def reset_password_request():
     form = RequestPasswordResetForm()
     if form.validate_on_submit():
         user = User.query.filter_by(email=form.email.data).first()
-        send_reset_password_email(user)
+        user.send_reset_password_email()
         flash('An email has been sent with instructions to reset your password.', 'info')
         return redirect(url_for('users.login'))
     return render_template('users/reset_password_request.html', title='Reset Password', form=form)

@@ -6,7 +6,7 @@ from flask_wtf.file import FileField, FileAllowed
 from wtforms import BooleanField, PasswordField, StringField, SubmitField
 from wtforms.validators import DataRequired, Email, EqualTo, Length, ValidationError
 
-from flaskapp.models import User
+from flaskapp.users.models import User
 from flaskapp.users.utils import check_password_strength
 
 # When we use this forms we need to set a secret key for our application.
