@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request
+from flask import Blueprint, render_template, request, make_response
 
 
 main = Blueprint('main', __name__)
@@ -17,4 +17,8 @@ main = Blueprint('main', __name__)
 @main.route('/')
 @main.route('/home')
 def home():
-    return render_template('home.html.j2', title='Master Thesis Flask')
+    response = make_response(render_template(
+        'home.html.j2', title='Master Thesis Flask'))
+    response.headers['Content-Security-Policy'] = "default-src 'self'"
+    # return response
+    return render_template('home.html', title='Master Thesis Flask')

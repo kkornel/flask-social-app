@@ -3,5 +3,10 @@
     "python.formatting.autopep8Args": [
         "--ignore",
         "E402"
-    ]
+    ],
+    "[python]": {
+        "editor.codeActionsOnSave": {
+            "source.organizeImports": false
+        },
+    },
 }

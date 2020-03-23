@@ -18,7 +18,7 @@ def load_user(user_id):
 # and processing will continue.)
 
 
-#  UserMixin, which provides default implementations for all of these properties and methods.
+# UserMixin, which provides default implementations for all of these properties and methods.
 # is_authenticated
 # is_active
 # is_anonymous
