@@ -17,14 +17,20 @@ from flaskapp.users.utils import check_password_strength
 
 
 class RegistrationForm(FlaskForm):
-    email = StringField('Email', validators=[DataRequired(), Email()])
+    email = StringField('Email',
+                        validators=[DataRequired(), Email()],
+                        render_kw={'placeholder': 'Email address'})
     username = StringField('Username',
                            validators=[DataRequired(),
-                                       Length(min=4, max=15)])
-    password = PasswordField('Password', validators=[DataRequired()])
+                                       Length(min=4, max=15)],
+                           render_kw={'placeholder': 'Username'})
+    password = PasswordField('Password',
+                             validators=[DataRequired()],
+                             render_kw={'placeholder': 'Password'})
     confirm_password = PasswordField(
-        'Confirm Password', validators=[DataRequired(),
-                                        EqualTo('password')])
+        'Confirm Password',
+        validators=[DataRequired(), EqualTo('password')],
+        render_kw={'placeholder': 'Password confirmation'})
     recaptcha = RecaptchaField(
         validators=[Recaptcha(message="Check the reCaptcha field.")])
     submit = SubmitField('Sign Up')
@@ -60,15 +66,21 @@ class RegistrationForm(FlaskForm):
 
 
 class LoginForm(FlaskForm):
-    email = StringField('Email', validators=[DataRequired(), Email()])
-    password = PasswordField('Password', validators=[DataRequired()])
+    email = StringField('Email',
+                        validators=[DataRequired(), Email()],
+                        render_kw={'placeholder': 'Email'})
+    password = PasswordField('Password',
+                             validators=[DataRequired()],
+                             render_kw={'placeholder': 'Password'})
     # Uses secure cookie to stay logged in for some time, after closing the browser.
     remember = BooleanField('Remember Me')
     submit = SubmitField('Login')
 
 
 class RequestPasswordResetForm(FlaskForm):
-    email = StringField('Email', validators=[DataRequired(), Email()])
+    email = StringField('Email',
+                        validators=[DataRequired(), Email()],
+                        render_kw={'placeholder': 'Email address'})
     recaptcha = RecaptchaField(
         validators=[Recaptcha(message="Check the reCaptcha field.")])
     submit = SubmitField('Request Pasword Reset')
@@ -81,10 +93,13 @@ class RequestPasswordResetForm(FlaskForm):
 
 
 class ResetPasswordForm(FlaskForm):
-    password = PasswordField('New Password', validators=[DataRequired()])
+    password = PasswordField('New Password',
+                             validators=[DataRequired()],
+                             render_kw={'placeholder': 'New password'})
     confirm_password = PasswordField(
-        'Confirm Password', validators=[DataRequired(),
-                                        EqualTo('password')])
+        'Confirm Password',
+        validators=[DataRequired(), EqualTo('password')],
+        render_kw={'placeholder': 'New password confirmation'})
     submit = SubmitField('Reset Password')
 
     def validate_password(self, password):
@@ -99,11 +114,18 @@ class ResetPasswordForm(FlaskForm):
 
 
 class UpdateProfileForm(FlaskForm):
-    email = StringField('Email', validators=[Email()])
-    username = StringField('Username', validators=[Length(min=4, max=15)])
-    password = PasswordField('New Password')
-    confirm_password = PasswordField('Confirm Password',
-                                     validators=[EqualTo('password')])
+    email = StringField('Email',
+                        validators=[Email()],
+                        render_kw={'placeholder': 'Email address'})
+    username = StringField('Username',
+                           validators=[Length(min=4, max=15)],
+                           render_kw={'placeholder': 'Username'})
+    password = PasswordField('New Password',
+                             render_kw={'placeholder': 'New password'})
+    confirm_password = PasswordField(
+        'Confirm Password',
+        validators=[EqualTo('password')],
+        render_kw={'placeholder': 'New password confirmation'})
     image = FileField('Update Profile Image',
                       validators=[FileAllowed(['jpg', 'png'])])
     submit = SubmitField('Update Profile')

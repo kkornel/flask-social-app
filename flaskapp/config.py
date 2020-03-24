@@ -1,6 +1,5 @@
 import os
 
-
 # Initially all configuration was in __int__.py,
 # but if we want to run our app with different congiruation,
 # we can make config.py classes based file.
@@ -26,7 +25,7 @@ class Config:
     MAIL_DEFAULT_SENDER = 'noreply@demo.com'
     RECAPTCHA_PUBLIC_KEY = os.environ.get('RECAPTCHA_PUBLIC_KEY')
     RECAPTCHA_PRIVATE_KEY = os.environ.get('RECAPTCHA_PRIVATE_KEY')
-    # RECAPTCHA_DATA_ATTRS = {'theme': 'dark'}
+    RECAPTCHA_DATA_ATTRS = {'theme': 'dark'}
     # To environ
     SECURITY_RESET_PASSWORD_SALT = 'cbcb788d1334901da4b846c6adce4f0f'
     SECURITY_VERIFY_EMAIL_SALT = '75df285855af40a28eea4760bae29f58'

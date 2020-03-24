@@ -1,54 +1,59 @@
-{% extends "base.html.j2" %}
+{% extends "base.html" %}
 
-{% block content %}
-<div class="col-sm-6 offset-sm-3 mt-3">
-    <div class=block-content>
-        <form method="POST" action="" enctype="multipart/form-data">
-            {{ form.hidden_tag() }}
-            <fieldset class="form-group">
-                <legend class="border-bottom mb-4">Create new post!</legend>
-                <div class="form-group">
-                    {{ form.content.label(class="form-control-label") }}
-
-                    {% if form.content.errors %}
-                    {{ form.content(class="form-control form-control-lg is-invalid") }}
-                    <div class="invalid-feedback">
-                        {% for error in form.content.errors %}
-                        <span>{{ error }}</span>
-                        {% endfor %}
-                    </div>
-                    {% else %}
-                    {{ form.content(class="form-control form-control-lg") }}
-                    {% endif %}
-                </div>
-                <div class="form-group">
-                    {{ form.location.label(class="form-control-label") }}
-                    {% if form.location.errors %}
-                    {{ form.location(class="form-control form-control-lg is-invalid") }}
-                    <div class="invalid-feedback">
-                        {% for error in form.location.errors %}
-                        <span>{{ error }}</span>
-                        {% endfor %}
-                    </div>
-                    {% else %}
-                    {{ form.location(class="form-control form-control-lg") }}
-                    {% endif %}
-                </div>
-                <div class="form-group">
-                    {{ form.image.label() }}
-                    {{ form.image(class="form-control-file") }}
-                    {% if form.image.errors %}
-                    {% for error in form.image.errors %}
-                    <span class="text-danger">{{ error }}</span></br>
-                    {% endfor %}
-                    {% endif %}
-                </div>
-
-            </fieldset>
+{% block content_center %}
+{# <div class="col-sm-6 offset-sm-3 mt-3 block-content-borders"> #}
+<div class="col-md-7 main-column ">
+    <form method="POST" action="" enctype="multipart/form-data">
+        {{ form.hidden_tag() }}
+        <fieldset class="form-group">
+            <legend class="border-bottom mb-4">Add new post</legend>
             <div class="form-group">
-                {{ form.submit(class="btn btn-outline-info") }}
+                {# {{ form.content.label(class="form-control-label") }} #}
+
+                {% if form.content.errors %}
+                {{ form.content(class="form-control is-invalid") }}
+                <div class="invalid-feedback">
+                    {% for error in form.content.errors %}
+                    <span>{{ error }}</span>
+                    {% endfor %}
+                </div>
+                {% else %}
+                {{ form.content(class="form-control") }}
+                {% endif %}
             </div>
-        </form>
-    </div>
+            <div class="form-group">
+                {{ form.location.label(class="form-control-label") }}
+                {% if form.location.errors %}
+                {{ form.location(class="form-control is-invalid") }}
+                <div class="invalid-feedback">
+                    {% for error in form.location.errors %}
+                    <span>{{ error }}</span>
+                    {% endfor %}
+                </div>
+                {% else %}
+                {{ form.location(class="form-control") }}
+                {% endif %}
+            </div>
+            <div class="form-group">
+                {{ form.image.label() }}
+                {{ form.image(class="form-control-file") }}
+                {% if form.image.errors %}
+                {% for error in form.image.errors %}
+                <span class="text-danger">{{ error }}</span></br>
+                {% endfor %}
+                {% endif %}
+            </div>
+
+        </fieldset>
+        <div class="form-group">
+
+        </div>
+        <div class="form-group align-right">
+            {# <a class="btn btn-outline-secondary mr-2" href="{{ request.META.HTTP_REFERER }}">Cancel</a> #}
+            {# <a class="btn btn-outline-secondary mr-2" href="javascript:history.back()">Cancel</a> #}
+            <a class="btn btn-outline-secondary mr-2" href="{{request.referrer}}">Cancel</a>
+            {{ form.submit(class="btn purple-btn-outline") }}
+        </div>
+    </form>
 </div>
-{% endblock content %}
+{% endblock content_center %}

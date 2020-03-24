@@ -10,12 +10,12 @@ class PostCreateForm(FlaskForm):
     content = TextAreaField('Content', 
                             validators=[DataRequired(), Length(max=280)], 
                             render_kw={'placeholder': 'What\'s up?', 'class': 'form-control', 'rows': 8, 'style': 'resize:none;'})
-    location = StringField('Location', 
+    location = StringField('Where are you at?', 
                             validators=[Length(max=40)], 
                             render_kw={'placeholder': 'Helsinki, Finland'})
     image = FileField('Got any photo?',
                       validators=[FileAllowed(['jpg', 'png'])])
-    submit = SubmitField('Post!')
+    submit = SubmitField('Add')
 
 
 # class PostCreateForm(forms.ModelForm):

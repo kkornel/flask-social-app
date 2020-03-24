@@ -169,7 +169,8 @@ def profile():
     elif request.method == 'GET':
         form.username.data = current_user.username
         form.email.data = current_user.email
-    image = url_for('static', filename=f'profile_imgs/{current_user.image}')
+    image = url_for('static',
+                    filename=f'profile_imgs/{current_user.profile.image}')
     return render_template('users/profile.html',
                            title='Profile',
                            image=image,
