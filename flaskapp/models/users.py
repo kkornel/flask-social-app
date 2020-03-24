@@ -164,13 +164,27 @@ class User(db.Model, UserMixin):
 
 class Profile(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey(
-        'user.id', ondelete='CASCADE'), nullable=False)
+    user_id = db.Column(db.Integer,
+                        db.ForeignKey('user.id', ondelete='CASCADE'),
+                        nullable=False)
     bio = db.Column(db.String(300), nullable=True)
     city = db.Column(db.String(100), nullable=True)
     website = db.Column(db.String(40), nullable=True)
     # Users have to have at least default img, so nullable=False.
     image = db.Column(db.String(20), nullable=False, default='default.jpg')
+    posts = db.relationship('Post', backref='author')
+
+    # posts = db.relationship('Post',
+    # backref='author',
+    # cascade="all, delete-orphan",
+    # passive_deletes=True,
+    # lazy=True)
+
+    # commments = db.relationship('Comment',
+    #                             backref='author',
+    #                             cascade="all, delete-orphan",
+    #                             passive_deletes=True,
+    #                             lazy=True)
 
     # follows = models.ManyToManyField('self',
     #                                  through='Follow',

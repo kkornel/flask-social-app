@@ -6,7 +6,7 @@ from flask_wtf.file import FileField, FileAllowed
 from wtforms import BooleanField, PasswordField, StringField, SubmitField
 from wtforms.validators import DataRequired, Email, EqualTo, Length, ValidationError
 
-from flaskapp.users.models import User
+from flaskapp.models.users import User
 from flaskapp.users.utils import check_password_strength
 
 # When we use this forms we need to set a secret key for our application.
@@ -19,10 +19,12 @@ from flaskapp.users.utils import check_password_strength
 class RegistrationForm(FlaskForm):
     email = StringField('Email', validators=[DataRequired(), Email()])
     username = StringField('Username',
-                           validators=[DataRequired(), Length(min=4, max=15)])
+                           validators=[DataRequired(),
+                                       Length(min=4, max=15)])
     password = PasswordField('Password', validators=[DataRequired()])
-    confirm_password = PasswordField('Confirm Password',
-                                     validators=[DataRequired(), EqualTo('password')])
+    confirm_password = PasswordField(
+        'Confirm Password', validators=[DataRequired(),
+                                        EqualTo('password')])
     recaptcha = RecaptchaField(
         validators=[Recaptcha(message="Check the reCaptcha field.")])
     submit = SubmitField('Sign Up')
@@ -37,7 +39,9 @@ class RegistrationForm(FlaskForm):
         if user:
             raise ValidationError(
                 # Markup(f'''That email is already in use. <a href="{{ url_for('users.reset_password_request') }}">Forgot Password?</a>'''))
-                Markup(f'''That email is already in use. <a href="http://127.0.0.1:5000/reset_password">Forgot Password?</a>'''))
+                Markup(
+                    f'''That email is already in use. <a href="http://127.0.0.1:5000/reset_password">Forgot Password?</a>'''
+                ))
 
     def validate_username(self, username):
         user = User.query.filter_by(username=username.data).first()
@@ -56,18 +60,15 @@ class RegistrationForm(FlaskForm):
 
 
 class LoginForm(FlaskForm):
-    email = StringField('Email',
-                        validators=[DataRequired(), Email()])
-    password = PasswordField('Password',
-                             validators=[DataRequired()])
+    email = StringField('Email', validators=[DataRequired(), Email()])
+    password = PasswordField('Password', validators=[DataRequired()])
     # Uses secure cookie to stay logged in for some time, after closing the browser.
     remember = BooleanField('Remember Me')
     submit = SubmitField('Login')
 
 
 class RequestPasswordResetForm(FlaskForm):
-    email = StringField('Email',
-                        validators=[DataRequired(), Email()])
+    email = StringField('Email', validators=[DataRequired(), Email()])
     recaptcha = RecaptchaField(
         validators=[Recaptcha(message="Check the reCaptcha field.")])
     submit = SubmitField('Request Pasword Reset')
@@ -81,8 +82,9 @@ class RequestPasswordResetForm(FlaskForm):
 
 class ResetPasswordForm(FlaskForm):
     password = PasswordField('New Password', validators=[DataRequired()])
-    confirm_password = PasswordField('Confirm Password',
-                                     validators=[DataRequired(), EqualTo('password')])
+    confirm_password = PasswordField(
+        'Confirm Password', validators=[DataRequired(),
+                                        EqualTo('password')])
     submit = SubmitField('Reset Password')
 
     def validate_password(self, password):
@@ -98,8 +100,7 @@ class ResetPasswordForm(FlaskForm):
 
 class UpdateProfileForm(FlaskForm):
     email = StringField('Email', validators=[Email()])
-    username = StringField('Username',
-                           validators=[Length(min=4, max=15)])
+    username = StringField('Username', validators=[Length(min=4, max=15)])
     password = PasswordField('New Password')
     confirm_password = PasswordField('Confirm Password',
                                      validators=[EqualTo('password')])

@@ -112,15 +112,18 @@ def create_app(config_class=Config):
 
     from flaskapp.main.routes import main
     from flaskapp.users.routes import users
-    # from flaskblog.posts.routes import posts
+    from flaskapp.social.routes import social
     # from flaskblog.errors.handlers import errors
 
     app.register_blueprint(main)
     app.register_blueprint(users)
-    # app.register_blueprint(posts)
+    app.register_blueprint(social)
     # app.register_blueprint(errors)
+
+    from flaskapp.social.routes import MyView
 
     with app.app_context():
         db.create_all()
+        app.add_url_rule('/new2', view_func=MyView.as_view('myview'))
 
     return app

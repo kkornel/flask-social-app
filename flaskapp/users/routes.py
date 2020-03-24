@@ -1,10 +1,12 @@
+from flask import current_app as app
 from flask import Blueprint, current_app, flash, redirect, render_template, request, url_for
 from flask_login import current_user, login_user, logout_user, login_required
 
 from flaskapp import db, bcrypt
-from flaskapp.users.models import User, Profile
 from flaskapp.users.forms import LoginForm, RegistrationForm, RequestPasswordResetForm, ResetPasswordForm, UpdateProfileForm
 from flaskapp.users.utils import save_image
+
+from flaskapp.models.users import User, Profile
 
 users = Blueprint('users', __name__)
 
@@ -13,7 +15,7 @@ users = Blueprint('users', __name__)
 # Instead we are going to create route specifically for this user's blueprint.
 # And then register these with the application later.
 
-from flask import current_app as app
+
 @users.route('/register', methods=['GET', 'POST'])
 def register():
     if current_user.is_authenticated:
@@ -37,16 +39,16 @@ def register():
 
         user.send_verification_email()
         # 'success' is the name of the BootStrap class for message.
-        flash(
-            f'A confirmation email has been sent to {form.email.data}', 'success')
+        flash(f'A confirmation email has been sent to {form.email.data}',
+              'success')
         return redirect(url_for('users.login'))
     return render_template('users/register.html', title='Register', form=form)
 
 
 @users.route('/confirm/<token>')
 def confirm_email(token):
-    user = User.verify_token(
-        token, current_app.config['SECURITY_VERIFY_EMAIL_SALT'])
+    user = User.verify_token(token,
+                             current_app.config['SECURITY_VERIFY_EMAIL_SALT'])
     if user is None:
         flash('That is an invalid or expired token', 'warning')
     elif user.active:
@@ -55,7 +57,8 @@ def confirm_email(token):
         user.active = True
         db.session.add(user)
         db.session.commit()
-        flash('You have confirmed your account. You can log in now.', 'success')
+        flash('You have confirmed your account. You can log in now.',
+              'success')
     return redirect(url_for('users.login'))
 
 
@@ -66,10 +69,14 @@ def login():
     form = LoginForm()
     if form.validate_on_submit():
         user = User.query.filter_by(email=form.email.data).first()
-        if user and bcrypt.check_password_hash(user.password, form.password.data):
+        if user and bcrypt.check_password_hash(user.password,
+                                               form.password.data):
             if not user.active:
-                flash('In order to log in please confirm your account!', 'warning')
-                return render_template('users/login.html', title='Login', form=form)
+                flash('In order to log in please confirm your account!',
+                      'warning')
+                return render_template('users/login.html',
+                                       title='Login',
+                                       form=form)
             # remember refers to the Remember me on Login page.
             login_user(user, remember=form.remember.data)
             # When we try to access a page that requires login, eg. account page.
@@ -79,9 +86,11 @@ def login():
             # Here we are getting that parameter and redirecting user to that page.
             next_page = request.args.get('next')
             current_app.logger.info('Next page parameter: %s', next_page)
-            return redirect(next_page) if next_page else redirect(url_for('main.home'))
+            return redirect(next_page) if next_page else redirect(
+                url_for('main.home'))
         else:
-            flash('Login Unsuccessful. Please check email and password.', 'danger')
+            flash('Login Unsuccessful. Please check email and password.',
+                  'danger')
     return render_template('users/login.html', title='Login', form=form)
 
 
@@ -99,9 +108,13 @@ def reset_password_request():
     if form.validate_on_submit():
         user = User.query.filter_by(email=form.email.data).first()
         user.send_reset_password_email()
-        flash('An email has been sent with instructions to reset your password.', 'info')
+        flash(
+            'An email has been sent with instructions to reset your password.',
+            'info')
         return redirect(url_for('users.login'))
-    return render_template('users/reset_password_request.html', title='Reset Password', form=form)
+    return render_template('users/reset_password_request.html',
+                           title='Reset Password',
+                           form=form)
 
 
 @users.route('/reset_password/<token>', methods=['GET', 'POST'])
@@ -119,9 +132,12 @@ def reset_password_token(token):
             form.password.data).decode('utf-8')
         user.password = hashed_password
         db.session.commit()
-        flash('Your password has been updated! You are now able to log in.', 'success')
+        flash('Your password has been updated! You are now able to log in.',
+              'success')
         return redirect(url_for('users.login'))
-    return render_template('users/reset_password_token.html', title='Set New Password', form=form)
+    return render_template('users/reset_password_token.html',
+                           title='Set New Password',
+                           form=form)
 
 
 @users.route('/profile', methods=['GET', 'POST'])
@@ -153,6 +169,8 @@ def profile():
     elif request.method == 'GET':
         form.username.data = current_user.username
         form.email.data = current_user.email
-    image = url_for(
-        'static', filename=f'profile_imgs/{current_user.image}')
-    return render_template('users/profile.html', title='Profile', image=image, form=form)
+    image = url_for('static', filename=f'profile_imgs/{current_user.image}')
+    return render_template('users/profile.html',
+                           title='Profile',
+                           image=image,
+                           form=form)
