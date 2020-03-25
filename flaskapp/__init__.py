@@ -1,3 +1,5 @@
+import logging
+
 from flask import Flask
 
 from flask_bcrypt import Bcrypt
@@ -22,7 +24,7 @@ dictConfig({
         'wsgi': {
             'class': 'logging.StreamHandler',
             'stream': 'ext://flask.logging.wsgi_errors_stream',
-            'formatter': 'default'
+            'formatter': 'default',
         }
     },
     'root': {
@@ -119,6 +121,9 @@ def create_app(config_class=Config):
     app.register_blueprint(users)
     app.register_blueprint(social)
     # app.register_blueprint(errors)
+
+    log = logging.getLogger('werkzeug')
+    log.setLevel(logging.WARNING)
 
     from flaskapp.social.routes import MyView
 

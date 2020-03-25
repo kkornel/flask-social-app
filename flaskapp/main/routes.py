@@ -3,8 +3,10 @@ import re
 
 from flask import Blueprint, render_template, request, make_response
 
+from flask_login import current_user
+
 from flaskapp.utils import generate_hashtag_link, generate_link
-from flaskapp.models.social import Post
+from flaskapp.models.social import Post, Comment
 
 main = Blueprint('main', __name__)
 
@@ -49,7 +51,7 @@ def _render_tags_and_links(obj):
 @main.app_template_filter('time_since_date_posted')
 def _time_since_date_posted(obj):
     if obj is not None:
-        diff = datetime.datetime.now() - obj
+        diff = datetime.datetime.utcnow() - obj
         s = diff.seconds
         if diff.days > 30 or diff.days < 0:
             return obj.strftime('Y-m-d H:i')
@@ -71,3 +73,20 @@ def _time_since_date_posted(obj):
             return '{} hours ago'.format(round(s / 3600))
     else:
         return None
+
+
+@main.app_context_processor
+def utility_processor():
+    def has_user_commented(post_id):
+        try:
+            profile = current_user.profile
+            post = Post.query.get(post_id)
+            all_user_comments_for_that_post = Comment.query.filter_by(
+                post_id=post_id, author_id=profile.id).all()
+            has_commented = len(all_user_comments_for_that_post) > 0
+            return has_commented
+        except Exception as e:
+            print(e)
+            return False
+
+    return dict(has_user_commented=has_user_commented)

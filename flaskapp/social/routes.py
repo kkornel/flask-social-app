@@ -8,8 +8,8 @@ from flask_login import current_user, login_required
 from flaskapp import db
 from flaskapp.decorators import is_author, prevent_authenticated
 from flaskapp.utils import save_image, delete_image
-from flaskapp.social.forms import PostCreateForm, PostDeleteForm, PostUpdateForm
-from flaskapp.models.social import Post
+from flaskapp.social.forms import PostCreateForm, PostDeleteForm, PostUpdateForm, CommentCreateForm, CommentDeleteForm
+from flaskapp.models.social import Post, Comment
 
 social = Blueprint('social', __name__)
 
@@ -39,7 +39,20 @@ def post_create():
 @login_required
 def post_detail(post_id):
     post = Post.query.get_or_404(post_id)
-    return render_template('social/post_detail.html', post=post)
+    app.logger.debug(post.comments)
+    form = CommentCreateForm()
+    if form.validate_on_submit():
+        comment = Comment(post_id=post_id,
+                          author_id=current_user.profile.id,
+                          content=form.content.data)
+
+        app.logger.debug(comment)
+
+        db.session.add(comment)
+        db.session.commit()
+        app.logger.debug(comment)
+
+    return render_template('social/post_detail.html', post=post, form=form)
 
 
 @social.route('/post/<int:post_id>/update/', methods=['GET', 'POST'])
@@ -84,6 +97,23 @@ def post_delete(post_id):
                            post=post)
 
 
+@social.route('/post/<int:post_id>/comment/<int:comment_id>/delete/',
+              methods=['GET', 'POST'])
+def comment_delete(post_id, comment_id):
+    post = Post.query.get_or_404(post_id)
+    comment = Comment.query.get_or_404(comment_id)
+    form = CommentDeleteForm()
+    if form.validate_on_submit():
+        db.session.delete(comment)
+        db.session.commit()
+        form = CommentCreateForm()
+        return redirect(
+            url_for('social.post_detail', form=form, post_id=post_id))
+    return render_template('social/comment_confirm_delete.html',
+                           form=form,
+                           comment=comment)
+
+
 class MyView(View):
     methods = ['GET', 'POST']
 
@@ -102,4 +132,3 @@ class MyView(View):
 
 # with app.app_context():
 #     app.add_url_rule('/new2', view_func=MyView.as_view('myview'))
-

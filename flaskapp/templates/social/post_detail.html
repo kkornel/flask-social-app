@@ -88,59 +88,83 @@
                 </div>
                 <div class="my-horizontal-bar post-metadata-date"></div>
                 <div class="justify-div">
-                    {#<div>
-                        {% has_user_commented user.pk post.pk as has_commented %}
-                        <a id="post-comment-{{post.id}}" href="{% url 'post-detail' post.pk %}#id_text"
+                    <div>
+                        {% set has_commented = has_user_commented(post.id) %}
+                        <a id="post-comment-{{post.id}}"
+                            href="{{ url_for('social.post_detail', post_id=post.id) }}#comments"
                             class="col-sec mr-2 post-detail-likes-panel {% if has_commented %}commented{% else %}comment{% endif %}"
                             onmouseover="$('#' + this.id).addClass('hvr-icon-wobble-horizontal');"
                             onmouseout="$('#' + this.id).removeClass('hvr-icon-wobble-horizontal');">
                             <i class="far fa-comment hvr-icon"></i>
-                            <small>{{ post.comments.all.count }}</small>
+                            <small>{{ post.comments|length }}</small>
                         </a>
                     </div>
                     <div>
-                        <a id="post-like-{{post.id}}" href="javascript:void(0);"
+                        {#<a id="post-like-{{post.id}}" href="javascript:void(0);"
                             class="post-detail-likes-panel {% if user.profile in post.likes.all %}liked{% else %}heart{% endif %}"
                             onclick="send_like(event, '{{post.pk}}', '{{user.pk}}', this.id, '{{ csrf_token }}');"
                             onmouseover="$('#' + this.id).addClass('hvr-icon-pulse-shrink');"
                             onmouseout="$('#' + this.id).removeClass('hvr-icon-pulse-shrink');">
                             <i class="far fa-heart hvr-icon"></i>
                             <small id="post-likes-count">{{ post.likes.all.count }}</small>
+                        </a>#}
+                        <a id="post-like-{{post.id}}" href="javascript:void(0);" class="post-detail-likes-panel heart"
+                            onclick="send_like(event, '{{post.pk}}', '{{current_user.pk}}', this.id, '{{ csrf_token }}');"
+                            onmouseover="$('#' + this.id).addClass('hvr-icon-pulse-shrink');"
+                            onmouseout="$('#' + this.id).removeClass('hvr-icon-pulse-shrink');">
+                            <i class="far fa-heart hvr-icon"></i>
+                            {# <small id="post-likes-count">{{ post.likes.all.count }}</small> #}
+                            <small id="post-likes-count">{{ 0 }}</small>
                         </a>
-                    </div>#}
+                    </div>
                 </div>
             </div>
         </article>
     </div>
     <div class="my-horizontal-bar"></div>
     <div id="comments">
-        <form method="POST" enctype="multipart/form-data">
-            {#{% csrf_token %}
+        <form method="POST" action="">
+            {{ form.hidden_tag() }}
             <fieldset class="form-group mb-0">
                 <legend class="border-bottom mb-2">Comments</legend>
-                {{ form|crispy }}
+                <div class="form-group">
+                    {# {{ form.content.label(class="form-control-label") }} #}
+
+                    {% if form.content.errors %}
+                    {{ form.content(class="form-control is-invalid") }}
+                    <div class="invalid-feedback">
+                        {% for error in form.content.errors %}
+                        <span>{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    {{ form.content(class="form-control") }}
+                    {% endif %}
+                </div>
             </fieldset>
             <div class="align-right">
-                <div class="form-group mr-2  mb-2" style="display: inline-block;">
+                <div class="form-group mr-2 mb-2" style="display: inline-block;">
                     <a class="create-comment link-hover btn purple-btn">Replay modal</a>
                 </div>
                 <div class="form-group mb-2" style="display: inline-block;">
-                    <button class="btn purple-btn" type="submit">Replay</button>
+                    {{ form.submit(class="btn purple-btn") }}
                 </div>
-            </div>#}
+            </div>
         </form>
         <div class="my-horizontal-bar mb-2"></div>
-        {#{% for comment in post.comments.all|dictsortreversed:"date_commented" %}
+        {% for comment in post.comments|sort(attribute='date_commented', reverse=True) %}
         <div class="post-detail-comment">
             <article class="media">
                 <span class="comment-author-img-sm-span">
-                    <a href="{% url 'profile' comment.author.user.username %}">
-                        <img class="rounded-circle author-img-sm" src="{{ comment.author.image.url }}">
+                    <a href="{{ url_for('users.profile', username=post.author.user.username) }}">
+                        <img class="rounded-circle author-img-sm"
+                            src="{{ url_for('static', filename='profile_imgs/' + comment.author.image) }}">
                     </a>
                 </span>
                 <div class="media-body">
                     <div>
-                        <a class="author-name-sm mr-1" href="{% url 'profile' post.author.user.username %}">
+                        <a class="author-name-sm mr-1"
+                            href="{{ url_for('users.profile', username=post.author.user.username) }}">
                             {{ comment.author.user.username }}
                         </a>
                         <span class="dimmed-metadata-text">
@@ -152,9 +176,15 @@
                             </small>
                         </span>
 
-                        {% if user.profile == post.author or user.profile == comment.author %}
+                        {% if current_user.profile == post.author or current_user.profile == comment.author %}
                         <div class="float-right">
+                            {# 
                             <a class="delete-comment link-hover" data-id="{% url 'comment-delete-modal' comment.pk %}">
+                                <i class="fas fa-times dark-icon "></i>
+                            </a>
+                            #}
+                            <a class="delete-comment link-hover"
+                                href="{{ url_for('social.comment_delete', post_id=post.id, comment_id=comment.id) }}">
                                 <i class="fas fa-times dark-icon "></i>
                             </a>
                         </div>
@@ -162,18 +192,17 @@
                     </div>
                     <div class="comment-content">
                         <p class="article-content normal-text-content">
-                            {{ comment.text|render_tags_and_links }}
+                            {{ comment.content|render_tags_and_links }}
                         </p>
                     </div>
                 </div>
             </article>
         </div>
-        {% empty %}
+        {% else %}
         <div class="content-center" style="margin-top: 32px;">
             <p>No comments yet.</p>
         </div>
         {% endfor %}
-        #}
     </div>
 </div>
 {% endblock content_center %}

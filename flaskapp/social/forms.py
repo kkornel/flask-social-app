@@ -8,7 +8,10 @@ from wtforms.validators import DataRequired, Email, EqualTo, Length, ValidationE
 class PostCreateForm(FlaskForm):
     content = TextAreaField('Content', 
                             validators=[DataRequired(), Length(max=280)], 
-                            render_kw={'placeholder': 'What\'s up?', 'class': 'form-control', 'rows': 8, 'style': 'resize:none;'})
+                            render_kw={'placeholder': 'What\'s up?', 
+                                        'class': 'form-control', 
+                                        'rows': 8, 
+                                        'style': 'resize:none;'})
     location = StringField('Where are you at?', 
                             validators=[Length(max=40)], 
                             render_kw={'placeholder': 'Helsinki, Finland'})
@@ -19,7 +22,10 @@ class PostCreateForm(FlaskForm):
 class PostUpdateForm(FlaskForm):
     content = TextAreaField('Edit content:', 
                             validators=[DataRequired(), Length(max=280)], 
-                            render_kw={'placeholder': 'What\'s up?', 'class': 'form-control', 'rows': 8, 'style': 'resize:none;'})
+                            render_kw={'placeholder': 'What\'s up?', 
+                                        'class': 'form-control', 
+                                        'rows': 8, 
+                                        'style': 'resize:none;'})
     location = StringField('Edit location:', 
                             validators=[Length(max=40)], 
                             render_kw={'placeholder': 'Helsinki, Finland'})
@@ -31,33 +37,15 @@ class PostUpdateForm(FlaskForm):
 class PostDeleteForm(FlaskForm):
     submit = SubmitField('Delete')
 
-# class PostCreateForm(forms.ModelForm):
-#     # If using CrispyForms, the only way to change background of textarea
-#     # is to define style here. With CSS selector it's not working.
-#     content = forms.CharField(
-#         label='',
-#         max_length=280,
-#         widget=forms.Textarea(
-#             attrs={
-#                 'rows': 4,
-#                 # 'cols': 30,
-#                 'style': 'resize:none;',
-#                 #   'style': 'resize:none; background-color: #15181c; color: #d9d9d9;',
-#                 'placeholder': 'What\'s up?',
-#             }))
-#     location = forms.CharField(
-#         label='Where are you at?',
-#         required=False,
-#         max_length=40,
-#         widget=forms.TextInput(attrs={
-#             'placeholder': 'Helsinki, Finland',
-#         }))
-#     # To remove 'Currently photo' and 'Clear' field,
-#     # use this after required: widget=forms.FileInput
-#     image = forms.ImageField(label='Got any photo?',
-#                              required=False,
-#                              widget=forms.FileInput)
+class CommentCreateForm(FlaskForm):
+    content = TextAreaField('Content', 
+                            validators=[Length(min=1, max=280)], 
+                            render_kw={'placeholder': 'Leave your comment',
+                                        'class': 'form-control', 
+                                        'rows': 3, 
+                                        'cols': 10,
+                                        'style':'resize:none;',})
+    submit = SubmitField('Replay')
 
-#     class Meta:
-#         model = Post
-#         fields = ['content', 'location', 'image']
+class CommentDeleteForm(FlaskForm):
+    submit = SubmitField('Delete')
