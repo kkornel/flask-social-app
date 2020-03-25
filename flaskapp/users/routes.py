@@ -4,8 +4,8 @@ from flask_login import current_user, login_user, logout_user, login_required
 
 from flaskapp import db, bcrypt
 from flaskapp.users.forms import LoginForm, RegistrationForm, RequestPasswordResetForm, ResetPasswordForm, UpdateProfileForm
-from flaskapp.users.utils import save_image
 
+from flaskapp.decorators import prevent_authenticated
 from flaskapp.models.users import User, Profile
 
 users = Blueprint('users', __name__)
@@ -16,7 +16,8 @@ users = Blueprint('users', __name__)
 # And then register these with the application later.
 
 
-@users.route('/register', methods=['GET', 'POST'])
+@users.route('/register/', methods=['GET', 'POST'])
+@prevent_authenticated
 def register():
     if current_user.is_authenticated:
         return redirect(url_for('main.home'))
@@ -45,7 +46,7 @@ def register():
     return render_template('users/register.html', title='Register', form=form)
 
 
-@users.route('/confirm/<token>')
+@users.route('/confirm/<token>/')
 def confirm_email(token):
     user = User.verify_token(token,
                              current_app.config['SECURITY_VERIFY_EMAIL_SALT'])
@@ -62,7 +63,8 @@ def confirm_email(token):
     return redirect(url_for('users.login'))
 
 
-@users.route('/login', methods=['GET', 'POST'])
+@users.route('/login/', methods=['GET', 'POST'])
+@prevent_authenticated
 def login():
     if current_user.is_authenticated:
         return redirect(url_for('main.home'))
@@ -94,13 +96,13 @@ def login():
     return render_template('users/login.html', title='Login', form=form)
 
 
-@users.route('/logout')
+@users.route('/logout/')
 def logout():
     logout_user()
     return redirect(url_for('users.login'))
 
 
-@users.route('/reset_password', methods=['GET', 'POST'])
+@users.route('/reset_password/', methods=['GET', 'POST'])
 def reset_password_request():
     if current_user.is_authenticated:
         return redirect(url_for('main.home'))
@@ -117,7 +119,7 @@ def reset_password_request():
                            form=form)
 
 
-@users.route('/reset_password/<token>', methods=['GET', 'POST'])
+@users.route('/reset_password/<token>/', methods=['GET', 'POST'])
 def reset_password_token(token):
     if current_user.is_authenticated:
         return redirect(url_for('main.home'))
@@ -140,15 +142,16 @@ def reset_password_token(token):
                            form=form)
 
 
-@users.route('/profile/<string:username>', methods=['GET', 'POST'])
+@users.route('/profile/<string:username>/', methods=['GET', 'POST'])
 @login_required
 def profile(username):
     form = UpdateProfileForm()
     if form.validate_on_submit():
         # We have to check because this field is not required.
         if form.image.data:
-            image_fn = save_image(form.image.data)
-            current_user.image = image_fn
+            if current_user.profile.image:
+                current_user.profile.delete_image()
+            current_user.profile.add_image(form.image.data)
         current_user.username = form.username.data
         current_user.email = form.email.data
         hashed_password = bcrypt.generate_password_hash(

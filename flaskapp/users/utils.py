@@ -37,34 +37,17 @@ def check_password_strength(password):
     symbol_error = re.search(r"\W", password) is None
 
     # overall result
-    password_ok = not (
-        length_error or digit_error or uppercase_error or lowercase_error or symbol_error)
+    password_ok = not (length_error or digit_error or uppercase_error
+                       or lowercase_error or symbol_error)
 
     # TODO uncomment later
     # return password_ok
     return True
 
 
-def save_image(form_image):
-    random_hex = secrets.token_hex(8)
-    # splitext returns filename and extension, but we don't need
-    # filename so we are using _
-    _, file_extension = os.path.splitext(form_image.filename)
-    image_fn = random_hex + file_extension
-    image_path = os.path.join(
-        current_app.root_path, 'static/profile_imgs', image_fn)
-    output_size = (125, 125)
-    img = Image.open(form_image)
-    img.thumbnail(output_size)
-    img.save(image_path)
-    return image_fn
-
-
 def send_email(to, subject, template):
-    msg = Message(
-        subject,
-        recipients=[to],
-        html=template,
-        sender=current_app.config['MAIL_DEFAULT_SENDER']
-    )
+    msg = Message(subject,
+                  recipients=[to],
+                  html=template,
+                  sender=current_app.config['MAIL_DEFAULT_SENDER'])
     mail.send(msg)

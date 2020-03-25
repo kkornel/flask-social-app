@@ -7,6 +7,7 @@ from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 from sqlalchemy import event
 
 from flaskapp import db, login_manager
+from flaskapp.utils import delete_image, save_image
 from flaskapp.users.utils import send_email
 
 
@@ -190,6 +191,16 @@ class Profile(db.Model):
     #                                  through='Follow',
     #                                  symmetrical=False,
     #                                  related_name='followers')
+
+    def add_image(self, image_data):
+        picture_file_name = save_image(image_data, 'static\profile_imgs',
+                                       (125, 125))
+        self.image = picture_file_name
+
+    def delete_image(self):
+        if self.image:
+            delete_image('static\profile_imgs', self.image)
+            self.image = None
 
     def __str__(self):
         return f"Profile({self.id}, '{self.user_id}', '{self.user}')"

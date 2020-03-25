@@ -7,7 +7,7 @@ from flask_login import current_user, login_required
 
 from flaskapp import db
 from flaskapp.decorators import is_author, prevent_authenticated
-from flaskapp.utils import generate_hashtag_link, generate_link, save_image, delete_image
+from flaskapp.utils import save_image, delete_image
 from flaskapp.social.forms import PostCreateForm, PostDeleteForm, PostUpdateForm
 from flaskapp.models.social import Post
 
@@ -103,17 +103,3 @@ class MyView(View):
 # with app.app_context():
 #     app.add_url_rule('/new2', view_func=MyView.as_view('myview'))
 
-
-@social.app_template_filter('render_tags_and_links')
-def _render_tags_and_links(obj):
-    text = re.sub(r"#(\w+)", lambda m: generate_hashtag_link(m.group(1)), obj)
-    # return re.sub(r"(?P<url>https?://[^\s]+)", lambda m: generate_link(m.group(1)), text)
-
-    # If you want Django to mark it as safe content, you can do the following:
-    # return mark_safe(
-    #     re.sub(
-    #         r"((http|https)\:\/\/)?[a-zA-Z0-9\.\/\?\:@\-_=#]+\.([a-zA-Z]){2,6}([a-zA-Z0-9\.\&\/\?\:@\-_=#])*",
-    #         lambda m: generate_link(m.group(0)), text))
-    return re.sub(
-        r"((http|https)\:\/\/)?[a-zA-Z0-9\.\/\?\:@\-_=#]+\.([a-zA-Z]){2,6}([a-zA-Z0-9\.\&\/\?\:@\-_=#])*",
-        lambda m: generate_link(m.group(0)), text)

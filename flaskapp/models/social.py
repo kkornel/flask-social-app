@@ -25,13 +25,14 @@ class Post(db.Model):
     #    related_name='likes')
 
     def add_image(self, image_data):
-        picture_file_name = save_image(image_data, 'static/posts_imgs',
+        picture_file_name = save_image(image_data, 'static\posts_imgs',
                                        (510, 515))
         self.image = picture_file_name
 
     def delete_image(self):
-        delete_image('static\posts_imgs', self.image)
-        self.image = None
+        if self.image:
+            delete_image('static\posts_imgs', self.image)
+            self.image = None
 
     def __repr__(self):
         return f"Post({self.id}, '{self.author_id}', '{self.content}', '{self.location}', '{self.date_posted}', '{self.image}')"
