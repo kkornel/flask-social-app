@@ -1,6 +1,6 @@
 import re
 
-from flask import Blueprint, current_app as app, redirect, render_template, request, url_for, request
+from flask import Blueprint, current_app as app, redirect, render_template, request, url_for, request, jsonify
 from flask.views import View
 
 from flask_login import current_user, login_required
@@ -10,11 +10,40 @@ from flaskapp.decorators import is_author, prevent_authenticated
 from flaskapp.utils import save_image, delete_image
 from flaskapp.social.forms import PostCreateForm, PostDeleteForm, PostUpdateForm, CommentCreateForm, CommentDeleteForm
 from flaskapp.models.social import Post, Comment
+from flaskapp.models.users import User, Profile
 
 social = Blueprint('social', __name__)
 
 
-@social.route('/new/To', methods=['GET', 'POST'])
+@social.route('/like/', methods=['POST'])
+def like():
+    if request.method == 'POST':
+        post_id = request.form['post_id']
+        profile_id = request.form['profile_id']
+
+        profile = Profile.query.get(profile_id)
+        post = Post.query.get(post_id)
+
+        app.logger.debug(profile.likes)
+        app.logger.debug(post.likes)
+
+        if profile in post.likes:
+            post.likes.remove(profile)
+        else:
+            post.likes.append(profile)
+
+        db.session.add(post)
+        db.session.commit()
+
+        app.logger.debug(profile.likes)
+        app.logger.debug(post.likes)
+        app.logger.debug(len(post.likes))
+
+        return jsonify({'likes_count': len(post.likes)})
+    return jsonify({'error': 'GET method'})
+
+
+@social.route('/new/', methods=['GET', 'POST'])
 @login_required
 def post_create():
     form = PostCreateForm()
@@ -25,10 +54,8 @@ def post_create():
                     location=form.location.data)
         if form.image.data:
             post.add_image(form.image.data)
-
         db.session.add(post)
         db.session.commit()
-
         return redirect(url_for('social.post_detail', post_id=post.id))
     return render_template('social/post_create.html',
                            title='Create post',
@@ -45,13 +72,9 @@ def post_detail(post_id):
         comment = Comment(post_id=post_id,
                           author_id=current_user.profile.id,
                           content=form.content.data)
-
-        app.logger.debug(comment)
-
         db.session.add(comment)
         db.session.commit()
-        app.logger.debug(comment)
-
+        return redirect(url_for('social.post_detail', post_id=post.id))
     return render_template('social/post_detail.html', post=post, form=form)
 
 

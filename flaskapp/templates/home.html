@@ -69,27 +69,27 @@
                 <div class="post-likes-panel">
                     <div class="align-right">
                         <div class="row">
-                            {# <div>
-                                {% has_user_commented user.pk post.pk as has_commented %}
-                                <a id="post-comment-{{post.id}}" href="{% url 'post-detail' post.pk %}#id_text"
-                                    class="col-sec mr-2 {% if has_commented %}commented{% else %}comment{% endif %}"
+                            <div>
+                                {% set has_commented = has_user_commented(post.id) %}
+                                <a id="post-comment-{{post.id}}"
+                                    href="{{ url_for('social.post_detail', post_id=post.id) }}#comments"
+                                    class="col-sec mr-2 post-detail-likes-panel {% if has_commented %}commented{% else %}comment{% endif %}"
                                     onmouseover="$('#' + this.id).addClass('hvr-icon-wobble-horizontal');"
                                     onmouseout="$('#' + this.id).removeClass('hvr-icon-wobble-horizontal');">
                                     <i class="far fa-comment hvr-icon"></i>
-                                    <small>{{ post.comments.all.count }}</small>
+                                    <small>{{ post.comments|length }}</small>
                                 </a>
                             </div>
                             <div>
                                 <a id="post-like-{{post.id}}" href="javascript:void(0);"
-                                    class="{% if user.profile in post.likes.all %}liked{% else %}heart{% endif %}"
-                                    onclick="send_like(event, '{{post.pk}}', '{{user.pk}}', this.id, '{{ csrf_token }}');"
+                                    class="post-detail-likes-panel {% if current_user.profile in post.likes %}liked{% else %}heart{% endif %}"
+                                    onclick="send_like(event, '{{post.id}}', '{{current_user.profile.id}}', this.id);"
                                     onmouseover="$('#' + this.id).addClass('hvr-icon-pulse-shrink');"
                                     onmouseout="$('#' + this.id).removeClass('hvr-icon-pulse-shrink');">
                                     <i class="far fa-heart hvr-icon"></i>
-                                    <small id="post-likes-count">{{ post.likes.all.count }}</small>
+                                    <small id="post-likes-count">{{ post.likes|length }}</small>
                                 </a>
                             </div>
-                        </div>#}
                         </div>
                     </div>
                 </div>

@@ -173,8 +173,14 @@ class Profile(db.Model):
     website = db.Column(db.String(40), nullable=True)
     # Users have to have at least default img, so nullable=False.
     image = db.Column(db.String(20), nullable=False, default='default.jpg')
-    posts = db.relationship('Post', backref='author')
-    comments = db.relationship('Comment', backref='author')
+    posts = db.relationship('Post',
+                            cascade="all, delete-orphan",
+                            backref='author')
+    comments = db.relationship('Comment',
+                               cascade="all, delete-orphan",
+                               backref='author')
+
+    # likes = db.relationship('Like', backref='author')
 
     # posts = db.relationship('Post',
     # backref='author',

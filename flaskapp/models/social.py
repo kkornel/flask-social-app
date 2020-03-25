@@ -5,6 +5,22 @@ from flaskapp import db
 
 from flaskapp.utils import delete_image, save_image
 
+likes = db.Table(
+    'likes',
+    db.Column('profile_id',
+              db.Integer,
+              db.ForeignKey('profile.id'),
+              primary_key=True),
+    db.Column('post_id',
+              db.Integer,
+              db.ForeignKey('post.id'),
+              primary_key=True),
+    db.Column('date_liked',
+              db.DateTime,
+              nullable=False,
+              default=datetime.utcnow),
+)
+
 
 class Post(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -16,14 +32,15 @@ class Post(db.Model):
     date_posted = db.Column(db.DateTime,
                             nullable=False,
                             default=datetime.utcnow)
-
     image = db.Column(db.String(20), nullable=True)
-    comments = db.relationship('Comment', backref='post')
-
-    # likes = models.ManyToManyField(Profile,
-    #    blank=True,
-    #    through='Like',
-    #    related_name='likes')
+    comments = db.relationship('Comment',
+                               cascade="all, delete-orphan",
+                               backref='post')
+    # likes = db.relationship('Like', backref='post')
+    likes = db.relationship('Profile',
+                            secondary=likes,
+                            lazy='subquery',
+                            backref=db.backref('likes', lazy=True))
 
     def add_image(self, image_data):
         picture_file_name = save_image(image_data, 'static\posts_imgs',
@@ -62,4 +79,30 @@ class Comment(db.Model):
         return f"Comment({self.id}, '{self.post}', '{self.author}', '{self.content})"
 
 
+# class Page(db.Model):
+#     id = db.Column(db.Integer, primary_key=True)
+#     tags = db.relationship('Tag',
+#                            secondary=tags,
+#                            lazy='subquery',
+#                            backref=db.backref('pages', lazy=True))
+
+# class Tag(db.Model):
+#     id = db.Column(db.Integer, primary_key=True)
+
 # class Like(db.Model):
+#     id = db.Column(db.Integer, primary_key=True)
+#     author_id = db.Column(db.Integer,
+#                           db.ForeignKey('profile.id', ondelete='CASCADE'),
+#                           nullable=False)
+#     post_id = db.Column(db.Integer,
+#                         db.ForeignKey('post.id', ondelete='CASCADE'),
+#                         nullable=False)
+#     date_liked = db.Column(db.DateTime,
+#                            nullable=False,
+#                            default=datetime.utcnow)
+
+#     def __repr__(self):
+#         return f"Like({self.id}, '{self.post_id}', '{self.author_id}', '{self.date_liked}')"
+
+#     def __str__(self):
+#         return f"Like({self.id}, '{self.post}', '{self.author}')"

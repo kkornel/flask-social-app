@@ -4,7 +4,6 @@
 <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='post-detail.css') }}">
 {% endblock stylesheets %}
 
-
 {% block content_center %}
 <div class="col-md-7 main-column pr-0 pl-0">
     <div class="nav-back">
@@ -74,12 +73,9 @@
         <article class="media">
             <div class="media-body">
                 <p class="article-content post-detail-content">
-                    {#{{ post.content|render_tags_and_links }} #}
                     {{ post.content|render_tags_and_links }}
-                    {{ post.content }}
                 </p>
                 {% if post.image %}
-                <!-- TODO Fix all sizes of imgs -->
                 <img class="post-detail-image" src="{{ url_for('static', filename='posts_imgs/' + post.image) }}">
                 {% endif %}
 
@@ -100,21 +96,13 @@
                         </a>
                     </div>
                     <div>
-                        {#<a id="post-like-{{post.id}}" href="javascript:void(0);"
-                            class="post-detail-likes-panel {% if user.profile in post.likes.all %}liked{% else %}heart{% endif %}"
-                            onclick="send_like(event, '{{post.pk}}', '{{user.pk}}', this.id, '{{ csrf_token }}');"
+                        <a id="post-like-{{post.id}}" href="javascript:void(0);"
+                            class="post-detail-likes-panel {% if current_user.profile in post.likes %}liked{% else %}heart{% endif %}"
+                            onclick="send_like(event, '{{post.id}}', '{{current_user.profile.id}}', this.id);"
                             onmouseover="$('#' + this.id).addClass('hvr-icon-pulse-shrink');"
                             onmouseout="$('#' + this.id).removeClass('hvr-icon-pulse-shrink');">
                             <i class="far fa-heart hvr-icon"></i>
-                            <small id="post-likes-count">{{ post.likes.all.count }}</small>
-                        </a>#}
-                        <a id="post-like-{{post.id}}" href="javascript:void(0);" class="post-detail-likes-panel heart"
-                            onclick="send_like(event, '{{post.pk}}', '{{current_user.pk}}', this.id, '{{ csrf_token }}');"
-                            onmouseover="$('#' + this.id).addClass('hvr-icon-pulse-shrink');"
-                            onmouseout="$('#' + this.id).removeClass('hvr-icon-pulse-shrink');">
-                            <i class="far fa-heart hvr-icon"></i>
-                            {# <small id="post-likes-count">{{ post.likes.all.count }}</small> #}
-                            <small id="post-likes-count">{{ 0 }}</small>
+                            <small id="post-likes-count">{{ post.likes|length }}</small>
                         </a>
                     </div>
                 </div>

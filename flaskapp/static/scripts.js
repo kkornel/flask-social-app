@@ -1,19 +1,18 @@
-function send_like(event, postPk, userPk, postId, csrf) {
-    const aHrefLike = $('#' + postId);
+function send_like(event, post_id, profile_id, a_id) {
+    const aHrefLike = $('#' + a_id);
     const isLiked = aHrefLike.hasClass('liked');
-    const smallTextLikesCount = $('#' + postId).find("#post-likes-count");
+    const smallTextLikesCount = $('#' + a_id).find("#post-likes-count");
     aHrefLike.toggleClass("liked");
     aHrefLike.toggleClass("heart");
     $.ajax({
         url: '/like/',
         type: 'POST',
         data: {
-            'postId': postPk,
-            'userId': userPk,
-            csrfmiddlewaretoken: csrf,
+            'post_id': post_id,
+            'profile_id': profile_id,
         },
         success: function (data) {
-            let likesCount = parseInt(data);
+            let likesCount = parseInt(data.likes_count);
             smallTextLikesCount.text(likesCount);
         },
         error: function (data) {
