@@ -2,11 +2,10 @@
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileAllowed
 
-from wtforms import BooleanField, PasswordField, StringField, SubmitField, TextAreaField
+from wtforms import BooleanField, PasswordField, StringField, SubmitField, TextAreaField, BooleanField
 from wtforms.validators import DataRequired, Email, EqualTo, Length, ValidationError
 
 class PostCreateForm(FlaskForm):
-    render_kw={}
     content = TextAreaField('Content', 
                             validators=[DataRequired(), Length(max=280)], 
                             render_kw={'placeholder': 'What\'s up?', 'class': 'form-control', 'rows': 8, 'style': 'resize:none;'})
@@ -17,6 +16,20 @@ class PostCreateForm(FlaskForm):
                       validators=[FileAllowed(['jpg', 'png'])])
     submit = SubmitField('Add')
 
+class PostUpdateForm(FlaskForm):
+    content = TextAreaField('Edit content:', 
+                            validators=[DataRequired(), Length(max=280)], 
+                            render_kw={'placeholder': 'What\'s up?', 'class': 'form-control', 'rows': 8, 'style': 'resize:none;'})
+    location = StringField('Edit location:', 
+                            validators=[Length(max=40)], 
+                            render_kw={'placeholder': 'Helsinki, Finland'})
+    image = FileField('Change current image for new one:',
+                      validators=[FileAllowed(['jpg', 'png'])])
+    delete_current_image = BooleanField('or only delete current (checkbox):')
+    submit = SubmitField('Update')
+
+class PostDeleteForm(FlaskForm):
+    submit = SubmitField('Delete')
 
 # class PostCreateForm(forms.ModelForm):
 #     # If using CrispyForms, the only way to change background of textarea

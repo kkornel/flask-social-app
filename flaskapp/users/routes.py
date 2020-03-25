@@ -140,9 +140,9 @@ def reset_password_token(token):
                            form=form)
 
 
-@users.route('/profile', methods=['GET', 'POST'])
+@users.route('/profile/<string:username>', methods=['GET', 'POST'])
 @login_required
-def profile():
+def profile(username):
     form = UpdateProfileForm()
     if form.validate_on_submit():
         # We have to check because this field is not required.
@@ -165,7 +165,7 @@ def profile():
         # you about to run another POST request when you reload your page.
         # So redirecting is causing to send a GET request
         # and then we dont get that weird message.
-        return redirect(url_for('users.profile'))
+        return redirect(url_for('users.profile', current_user.username))
     elif request.method == 'GET':
         form.username.data = current_user.username
         form.email.data = current_user.email
