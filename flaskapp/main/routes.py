@@ -13,7 +13,7 @@ main = Blueprint('main', __name__)
 # This is decorator. Additional fuctionality to exisitng functions.
 # app.route will handle all of the complicated backend stuff and simply allow us to write a function that returns information that will be shown on our website for this specific route.
 @main.route('/')
-@main.route('/home')
+@main.route('/home/')
 def home():
     response = make_response(
         render_template('home.html', title='Master Thesis Flask'))

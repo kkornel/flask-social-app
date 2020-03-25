@@ -35,7 +35,10 @@ def save_image(form_picture, folder_path, picture_size):
 
 def delete_image(folder_name, file_name):
     path = os.path.join(current_app.root_path, folder_name, file_name)
+    current_app.logger.debug(f'Trying to remove image: {path}')
     if os.path.exists(path):
         os.remove(path)
+        current_app.logger.debug(f'Filed removed.')
         return True
+    current_app.logger.debug(f'Deletion failed.')
     return False

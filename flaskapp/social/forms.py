@@ -25,7 +25,7 @@ class PostUpdateForm(FlaskForm):
                             render_kw={'placeholder': 'Helsinki, Finland'})
     image = FileField('Change current image for new one:',
                       validators=[FileAllowed(['jpg', 'png'])])
-    delete_current_image = BooleanField('or only delete current (checkbox):')
+    delete_current_image = BooleanField('Delete current image?')
     submit = SubmitField('Update')
 
 class PostDeleteForm(FlaskForm):
