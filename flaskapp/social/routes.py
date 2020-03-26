@@ -24,9 +24,6 @@ def like():
         profile = Profile.query.get(profile_id)
         post = Post.query.get(post_id)
 
-        app.logger.debug(profile.likes)
-        app.logger.debug(post.likes)
-
         if profile in post.likes:
             post.likes.remove(profile)
         else:
@@ -35,11 +32,30 @@ def like():
         db.session.add(post)
         db.session.commit()
 
-        app.logger.debug(profile.likes)
-        app.logger.debug(post.likes)
-        app.logger.debug(len(post.likes))
-
         return jsonify({'likes_count': len(post.likes)})
+    return jsonify({'error': 'GET method'})
+
+
+@social.route('/follow/', methods=['POST'])
+def follow():
+    if request.method == 'POST':
+        follower_id = request.form['follower_id']
+        followed_id = request.form['followed_id']
+
+        follower = Profile.query.get(follower_id)
+        followed = Profile.query.get(followed_id)
+
+        if follower.is_following(followed):
+            follower.unfollow(followed)
+        else:
+            follower.follow(followed)
+
+        db.session.commit()
+
+        return jsonify({
+            'followers': followed.followers.count(),
+            'following': followed.followed.count()
+        })
     return jsonify({'error': 'GET method'})
 
 

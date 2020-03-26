@@ -3,7 +3,7 @@ import re
 
 from flask import Blueprint, render_template, request, make_response, current_app as app, Markup
 
-from flask_login import current_user
+from flask_login import current_user, login_required
 
 from flaskapp.utils import generate_hashtag_link, generate_link
 from flaskapp.models.social import Post, Comment
@@ -22,7 +22,7 @@ main = Blueprint('main', __name__)
 # This is decorator. Additional fuctionality to exisitng functions.
 # app.route will handle all of the complicated backend stuff and simply allow us to write a function that returns information that will be shown on our website for this specific route.
 @main.route('/')
-@main.route('/home/')
+@login_required
 def home():
     response = make_response(
         render_template('home.html', title='Master Thesis Flask'))
@@ -101,16 +101,11 @@ def utility_processor():
             print(e)
             return False
 
-    def is_already_following(follower_id, following_id):
-        app.logger.debug(f'FILTERS: {follower_id} {following_id}')
-
+    def is_already_following(follower_id, followed_id):
         try:
             follower = Profile.query.get(follower_id)
-            following = Profile.query.get(following_id)
-            # is_following = follower.is_following(following)
-            # app.logger.debug(f'FILTERS: {is_following}')
-            # return is_following
-            return False
+            followed = Profile.query.get(followed_id)
+            return follower.is_following(followed)
         except Exception:
             return False
 

@@ -66,10 +66,10 @@
 
                 {% if is_following %}
                 <a id="follow-btn" class="link-hover btn purple-btn-outline"
-                    onclick="follow_user(event, '{{current_user.profile.pk}}', '{{profile.pk}}', '{{ csrf_token }}');">Following</a>
+                    onclick="follow_user(event, '{{current_user.profile.id}}', '{{profile.id}}');">Following</a>
                 {% else %}
                 <a id="follow-btn" class="link-hover btn purple-btn"
-                    onclick="follow_user(event, '{{current_user.profile.pk}}', '{{profile.pk}}','{{ csrf_token }}');">Follow</a>
+                    onclick="follow_user(event, '{{current_user.profile.id}}', '{{profile.id}}');">Follow</a>
                 {% endif %}
                 </a>
             </div>
@@ -91,15 +91,13 @@
                         <div class="no-decoration link-hover">
 
                             <a class="followers">
-                                {#<span id='followers-count' class="main-text-bold">{{ profile.followers|length }}</span>#}
-                                <span id='followers-count' class="main-text-bold">{{0 }}</span>
+                                <span id='followers-count' class="main-text-bold">{{ profile.followers.count() }}</span>
                                 <span class="secondary-text"><small> followers</small></span>
                             </a>
                         </div>
                         <div class="no-decoration link-hover">
                             <a class="following">
-                                {#<span id='following-count' class="main-text-bold">{{ profile.follows|length }}</span>#}
-                                <span id='following-count' class="main-text-bold">{{ 0 }}</span>
+                                <span id='following-count' class="main-text-bold">{{ profile.followed.count() }}</span>
                                 <span class="secondary-text"><small> following</small></span>
                             </a>
                         </div>
@@ -143,7 +141,7 @@
     <div class="my-horizontal-bar"></div>
 
     <div id="posts"></div>
-    {% for post in posts %}
+    {% for post in posts|sort(attribute='date_posted', reverse=True) %}
     <div onclick="location.href='/post/{{ post.id }}/';" style="cursor: pointer; "
         onmouseover="this.getElementsByClassName('my-post')[0].style.backgroundColor = '#15181c';"
         onmouseout=" this.getElementsByClassName('my-post')[0].style.backgroundColor='black';">

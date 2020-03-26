@@ -22,6 +22,32 @@ function send_like(event, post_id, profile_id, a_id) {
     event.stopImmediatePropagation();
 }
 
+function follow_user(event, follower_id, followed_id) {
+    const aHrefFollow = $('#follow-btn');
+    aHrefFollow.toggleClass("purple-btn-outline");
+    aHrefFollow.toggleClass("purple-btn");
+    aHrefFollow.text((aHrefFollow.text() == 'Follow') ? 'Following' : 'Follow');
+    $.ajax({
+        url: '/follow/',
+        type: 'POST',
+        data: {
+            'follower_id': follower_id,
+            'followed_id': followed_id,
+        },
+        success: function (data) {
+            console.log(data);
+            followers = data.followers
+            following = data.following
+            $('#followers-count').text(followers);
+            $('#following-count').text(following);
+        },
+        error: function (data) {
+            console.log(data);
+        },
+    });
+    event.stopImmediatePropagation();
+}
+
 function openInNewTab(event, url) {
     var win = window.open(url, '_blank');
     win.focus();
@@ -45,38 +71,5 @@ function stopPropagation(event) {
 }
 
 function stopImmediatePropagation(event) {
-    event.stopImmediatePropagation();
-}
-
-// function stopImmediatePropagation(event) {
-//     event.stopImmediatePropagation();
-// }
-
-function follow_user(event, followerID, followingID, csrf) {
-    const aHrefFollow = $('#follow-btn');
-    aHrefFollow.toggleClass("purple-btn-outline");
-    aHrefFollow.toggleClass("purple-btn");
-    aHrefFollow.text((aHrefFollow.text() == 'Follow') ? 'Following' : 'Follow');
-    $.ajax({
-        url: '/follow/',
-        type: 'POST',
-        data: {
-            'followerID': followerID,
-            'followingID': followingID,
-            csrfmiddlewaretoken: csrf,
-        },
-        success: function (data) {
-            console.log(data);
-            data = JSON.parse(data);
-            followers = data["followers"];
-            following = data["following"];
-            console.log(data["following"]);
-            $('#followers-count').text(followers);
-            $('#following-count').text(following);
-        },
-        error: function (data) {
-            console.log(data);
-        },
-    });
     event.stopImmediatePropagation();
 }

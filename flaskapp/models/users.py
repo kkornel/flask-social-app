@@ -171,6 +171,13 @@ class User(db.Model, UserMixin):
         return f"User({self.id}, '{self.email}', '{self.username}')"
 
 
+followers = db.Table(
+    'followers',
+    db.Column('follower_id', db.Integer, db.ForeignKey('profile.id')),
+    db.Column('followed_id', db.Integer, db.ForeignKey('profile.id')),
+)
+
+
 class Profile(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer,
@@ -187,25 +194,35 @@ class Profile(db.Model):
     comments = db.relationship('Comment',
                                cascade="all, delete-orphan",
                                backref='author')
+    '''
+    * Profile is the right side entity of the relationship (the left side entity is the parent class). 
+    Since this is a self-referential relationship, I have to use the same class on both sides.
 
-    # likes = db.relationship('Like', backref='author')
+    * secondary configures the association table that is used for this relationship, 
+    which I defined right above this class.
 
-    # posts = db.relationship('Post',
-    # backref='author',
-    # cascade="all, delete-orphan",
-    # passive_deletes=True,
-    # lazy=True)
+    * primaryjoin indicates the condition that links the left side entity (the follower user) with the association table. 
+    The join condition for the left side of the relationship is the user ID matching the follower_id field of the association table. 
+    The followers.c.follower_id expression references the follower_id column of the association table.
 
-    # commments = db.relationship('Comment',
-    #                             backref='author',
-    #                             cascade="all, delete-orphan",
-    #                             passive_deletes=True,
-    #                             lazy=True)
+    * secondaryjoin indicates the condition that links the right side entity (the followed user) with the association table. 
+    This condition is similar to the one for primaryjoin, with the only difference that now I'm using followed_id, 
+    which is the other foreign key in the association table.
 
-    # follows = models.ManyToManyField('self',
-    #                                  through='Follow',
-    #                                  symmetrical=False,
-    #                                  related_name='followers')
+    * backref defines how this relationship will be accessed from the right side entity. 
+    From the left side, the relationship is named followed, so from the right side I am going to use the name followers 
+    to represent all the left side users that are linked to the target user in the right side. 
+    The additional lazy argument indicates the execution mode for this query. 
+    A mode of dynamic sets up the query to not run until specifically requested, which is also how I set up the posts one-to-many relationship.
+
+    * lazy is similar to the parameter of the same name in the backref, but this one applies to the left side query instead of the right side.'
+    '''
+    followed = db.relationship('Profile',
+                               secondary=followers,
+                               primaryjoin=(followers.c.follower_id == id),
+                               secondaryjoin=(followers.c.followed_id == id),
+                               backref=db.backref('followers', lazy='dynamic'),
+                               lazy='dynamic')
 
     def add_image(self, image_data):
         picture_file_name = save_image(image_data, 'static\profile_imgs',
@@ -220,6 +237,18 @@ class Profile(db.Model):
     def set_default_image(self):
         self.delete_image()
         self.image = 'default.jpg'
+
+    def follow(self, user):
+        if not self.is_following(user):
+            self.followed.append(user)
+
+    def unfollow(self, user):
+        if self.is_following(user):
+            self.followed.remove(user)
+
+    def is_following(self, user):
+        return self.followed.filter(
+            followers.c.followed_id == user.id).count() > 0
 
     def __str__(self):
         return f"Profile({self.id}, '{self.user_id}', '{self.user}')"

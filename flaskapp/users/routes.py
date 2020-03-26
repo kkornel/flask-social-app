@@ -180,6 +180,7 @@ def delete_account_confirmation(username):
     form = ProfileDeleteForm()
     if form.validate_on_submit():
         db.session.delete(current_user.profile)
+        db.session.delete(current_user)
         db.session.commit()
         flash('Your account has been deleted', 'danger')
         return redirect(url_for('users.login'))
