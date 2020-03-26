@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block content_center %}
+<div class="col-sm-7 mt-3 block-content-borders">
+    <form method="POST" action="" enctype="multipart/form-data">
+        {{ form.hidden_tag() }}
+        <fieldset class="form-group">
+            <legend class="border-bottom mb-4">Update your email address</legend>
+            <div class="form-group">
+                {# {{ form.username.label(class="form-control-label") }} #}
+
+                {% if form.email.errors %}
+                {{ form.email(class="form-control is-invalid") }}
+                <div class="invalid-feedback">
+                    {% for error in form.email.errors %}
+                    <span>{{ error }}</span>
+                    {% endfor %}
+                </div>
+                {% else %}
+                {{ form.email(class="form-control") }}
+                {% endif %}
+            </div>
+            <div class="form-group">
+                {# {{ form.current_password.label(class="form-control-label") }} #}
+
+                {% if form.current_password.errors %}
+                {{ form.current_password(class="form-control is-invalid") }}
+                <div class="invalid-feedback">
+                    {% for error in form.current_password.errors %}
+                    <span> {{ error }}</span>
+                    {% endfor %}
+                </div>
+                {% else %}
+                {{ form.current_password(class="form-control") }}
+                {% endif %}
+            </div>
+        </fieldset>
+        <div class="form-group">
+            {{ form.submit(class="btn purple-btn-outline") }}
+            <a class="btn btn-outline-secondary ml-2"
+                href="{{ url_for('users.profile', username=current_user.username) }}">Cancel</a>
+        </div>
+    </form>
+</div>
+{% endblock content_center %}

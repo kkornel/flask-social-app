@@ -1,0 +1,237 @@
+{% extends "base.html" %}
+
+{% block content_center %}
+<div class="col-sm-7 mt-3 block-content-borders">
+    <div class="media">
+        <img class="rounded-circle account-img"
+            src="{{ url_for('static', filename='profile_imgs/' + current_user.profile.image) }}">
+        <div class="media-body ml-4 mt-2">
+            <h2 class="account-heading">{{ current_user.username }}</h2>
+            <p class="text-secondary">{{ current_user.email }}</p>
+        </div>
+    </div>
+
+    <form method="POST" action="" enctype="multipart/form-data">
+        {{ form.hidden_tag() }}
+        <fieldset class="form-group mb-0">
+            <legend class="border-bottom mb-2">Account Info</legend>
+            <div class="form-group">
+                {{ form.username.label(class="form-control-label") }}
+
+                {% if form.username.errors %}
+                {{ form.username(class="form-control is-invalid") }}
+                <div class="invalid-feedback">
+                    {% for error in form.username.errors %}
+                    <span>{{ error }}</span>
+                    {% endfor %}
+                </div>
+                {% else %}
+                {{ form.username(class="form-control") }}
+                {% endif %}
+            </div>
+            <div class="form-group">
+                {{ form.bio.label(class="form-control-label") }}
+
+                {% if form.bio.errors %}
+                {{ form.bio(class="form-control is-invalid") }}
+                <div class="invalid-feedback">
+                    {% for error in form.bio.errors %}
+                    <span>{{ error }}</span>
+                    {% endfor %}
+                </div>
+                {% else %}
+                {{ form.bio(class="form-control") }}
+                {% endif %}
+            </div>
+            <div class="form-group">
+                {{ form.city.label(class="form-control-label") }}
+
+                {% if form.city.errors %}
+                {{ form.city(class="form-control is-invalid") }}
+                <div class="invalid-feedback">
+                    {% for error in form.city.errors %}
+                    <span>{{ error }}</span>
+                    {% endfor %}
+                </div>
+                {% else %}
+                {{ form.city(class="form-control") }}
+                {% endif %}
+            </div>
+            <div class="form-group">
+                {{ form.website.label(class="form-control-label") }}
+
+                {% if form.website.errors %}
+                {{ form.website(class="form-control is-invalid") }}
+                <div class="invalid-feedback">
+                    {% for error in form.website.errors %}
+                    <span>{{ error }}</span>
+                    {% endfor %}
+                </div>
+                {% else %}
+                {{ form.website(class="form-control") }}
+                {% endif %}
+            </div>
+            <div class="form-group">
+                {{ form.image.label() }}
+                {{ form.image(class="form-control-file") }}
+                {% if form.image.errors %}
+                {% for error in form.image.errors %}
+                <span class="text-danger">{{ error }}</span></br>
+                {% endfor %}
+                {% endif %}
+            </div>
+            <div class="form-group mb-2">
+                <div class="form-check">
+                    {{ form.delete_current_image(class="form-check-input") }}
+                    <label class="form-check-label">
+                        {{ form.delete_current_image.label(class="form-control-label") }}
+                    </label>
+                </div>
+            </div>
+        </fieldset>
+        <div class="form-group">
+            {{ form.submit(class="btn purple-btn-outline") }}
+            <a class="btn btn-outline-secondary ml-2"
+                href="{{ url_for('users.profile', username=current_user.username) }}">Cancel</a>
+        </div>
+    </form>
+</div>
+{% endblock content_center %}
+
+{#
+{% block content %}
+<div class="col-sm-7 offset-sm-3 mt-3 block-content-borders">
+    <div class="media">
+        <img class="rounded-circle account-img" src="{{ url_for('static', filename='profile_imgs/' + current_user.profile.image) }}">
+        <div class="media-body">
+            <h2 class="account-heading">{{ current_user.username }}</h2>
+            <p class="text-secondary">{{ current_user.email }}</p>
+        </div>
+    </div>
+
+    <form method="POST" action="" enctype="multipart/form-data">
+        {{ form.hidden_tag() }}
+        <fieldset class="form-group">
+            <legend class="border-bottom mb-4">Account Info</legend>
+            <div class="form-group">
+                {{ form.username.label(class="form-control-label") }}
+
+                {% if form.username.errors %}
+                {{ form.username(class="form-control is-invalid") }}
+                <div class="invalid-feedback">
+                    {% for error in form.username.errors %}
+                    <span>{{ error }}</span>
+                    {% endfor %}
+                </div>
+                {% else %}
+                {{ form.username(class="form-control") }}
+                {% endif %}
+            </div>
+            <div class="form-group">
+                {{ form.email.label(class="form-control-label") }}
+                {% if form.email.errors %}
+                {{ form.email(class="form-control is-invalid") }}
+                <div class="invalid-feedback">
+                    {% for error in form.email.errors %}
+                    <span>{{ error }}</span>
+                    {% endfor %}
+                </div>
+                {% else %}
+                {{ form.email(class="form-control") }}
+                {% endif %}
+            </div>
+            <div class="form-group">
+                {{ form.password.label(class="form-control-label") }}
+
+                {% if form.password.errors %}
+                {{ form.password(class="form-control is-invalid") }}
+                <div class="invalid-feedback">
+                    {% for error in form.password.errors %}
+                    <span> {{ error }}</span>
+                    {% endfor %}
+                </div>
+                {% else %}
+                {{ form.password(class="form-control") }}
+                {% endif %}
+            </div>
+            <div class="form-group">
+                {{ form.confirm_password.label(class="form-control-label") }}
+
+                {% if form.confirm_password.errors %}
+                {{ form.confirm_password(class="form-control is-invalid") }}
+                <div class="invalid-feedback">
+                    {% for error in form.confirm_password.errors %}
+                    <span> {{ error }}</span>
+                    {% endfor %}
+                </div>
+                {% else %}
+                {{ form.confirm_password(class="form-control") }}
+                {% endif %}
+            </div>
+            <div class="form-group">
+                {{ form.bio.label(class="form-control-label") }}
+
+                {% if form.bio.errors %}
+                {{ form.bio(class="form-control is-invalid") }}
+                <div class="invalid-feedback">
+                    {% for error in form.bio.errors %}
+                    <span>{{ error }}</span>
+                    {% endfor %}
+                </div>
+                {% else %}
+                {{ form.bio(class="form-control") }}
+                {% endif %}
+            </div>
+            <div class="form-group">
+                {{ form.city.label(class="form-control-label") }}
+
+                {% if form.city.errors %}
+                {{ form.city(class="form-control is-invalid") }}
+                <div class="invalid-feedback">
+                    {% for error in form.city.errors %}
+                    <span>{{ error }}</span>
+                    {% endfor %}
+                </div>
+                {% else %}
+                {{ form.city(class="form-control") }}
+                {% endif %}
+            </div>
+            <div class="form-group">
+                {{ form.website.label(class="form-control-label") }}
+
+                {% if form.website.errors %}
+                {{ form.website(class="form-control is-invalid") }}
+                <div class="invalid-feedback">
+                    {% for error in form.website.errors %}
+                    <span>{{ error }}</span>
+                    {% endfor %}
+                </div>
+                {% else %}
+                {{ form.website(class="form-control") }}
+                {% endif %}
+            </div>
+            <div class="form-group">
+                {{ form.image.label() }}
+                {{ form.image(class="form-control-file") }}
+                {% if form.image.errors %}
+                {% for error in form.image.errors %}
+                <span class="text-danger">{{ error }}</span></br>
+                {% endfor %}
+                {% endif %}
+            </div>
+            <div class="form-group">
+                <div class="form-check">
+                    {{ form.delete_current_image(class="form-check-input") }}
+                    <label class="form-check-label">
+                        {{ form.delete_current_image.label(class="form-control-label") }}
+                    </label>
+                </div>
+            </div>
+        </fieldset>
+        <div class="form-group">
+            {{ form.submit(class="btn purple-btn") }}
+        </div>
+    </form>
+</div>
+{% endblock content %}
+#}

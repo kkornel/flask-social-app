@@ -1,12 +1,13 @@
 import datetime
 import re
 
-from flask import Blueprint, render_template, request, make_response
+from flask import Blueprint, render_template, request, make_response, current_app as app, Markup
 
 from flask_login import current_user
 
 from flaskapp.utils import generate_hashtag_link, generate_link
 from flaskapp.models.social import Post, Comment
+from flaskapp.models.users import Profile
 
 main = Blueprint('main', __name__)
 
@@ -35,6 +36,8 @@ def home():
 
 @main.app_template_filter('render_tags_and_links')
 def _render_tags_and_links(obj):
+    if obj == None:
+        return ''
     text = re.sub(r"#(\w+)", lambda m: generate_hashtag_link(m.group(1)), obj)
     # return re.sub(r"(?P<url>https?://[^\s]+)", lambda m: generate_link(m.group(1)), text)
 
@@ -43,9 +46,18 @@ def _render_tags_and_links(obj):
     #     re.sub(
     #         r"((http|https)\:\/\/)?[a-zA-Z0-9\.\/\?\:@\-_=#]+\.([a-zA-Z]){2,6}([a-zA-Z0-9\.\&\/\?\:@\-_=#])*",
     #         lambda m: generate_link(m.group(0)), text))
-    return re.sub(
-        r"((http|https)\:\/\/)?[a-zA-Z0-9\.\/\?\:@\-_=#]+\.([a-zA-Z]){2,6}([a-zA-Z0-9\.\&\/\?\:@\-_=#])*",
-        lambda m: generate_link(m.group(0)), text)
+    return Markup(
+        re.sub(
+            r"((http|https)\:\/\/)?[a-zA-Z0-9\.\/\?\:@\-_=#]+\.([a-zA-Z]){2,6}([a-zA-Z0-9\.\&\/\?\:@\-_=#])*",
+            lambda m: generate_link(m.group(0)), text))
+
+
+@main.app_template_filter('render_links')
+def _render_links(obj):
+    return Markup(
+        re.sub(
+            r"((http|https)\:\/\/)?[a-zA-Z0-9\.\/\?\:@\-_=#]+\.([a-zA-Z]){2,6}([a-zA-Z0-9\.\&\/\?\:@\-_=#])*",
+            lambda m: generate_link(m.group(0)), obj))
 
 
 @main.app_template_filter('time_since_date_posted')
@@ -89,4 +101,18 @@ def utility_processor():
             print(e)
             return False
 
-    return dict(has_user_commented=has_user_commented)
+    def is_already_following(follower_id, following_id):
+        app.logger.debug(f'FILTERS: {follower_id} {following_id}')
+
+        try:
+            follower = Profile.query.get(follower_id)
+            following = Profile.query.get(following_id)
+            # is_following = follower.is_following(following)
+            # app.logger.debug(f'FILTERS: {is_following}')
+            # return is_following
+            return False
+        except Exception:
+            return False
+
+    return dict(has_user_commented=has_user_commented,
+                is_already_following=is_already_following)

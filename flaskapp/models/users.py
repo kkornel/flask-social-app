@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from flask import current_app as app
 from flask import current_app
 from flask import url_for, render_template
@@ -6,7 +8,7 @@ from flask_login import UserMixin
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 from sqlalchemy import event
 
-from flaskapp import db, login_manager
+from flaskapp import db, login_manager, bcrypt
 from flaskapp.utils import delete_image, save_image
 from flaskapp.users.utils import send_email
 
@@ -51,6 +53,9 @@ class User(db.Model, UserMixin):
                               cascade="all, delete-orphan",
                               passive_deletes=True,
                               backref='user')
+    date_joined = db.Column(db.DateTime,
+                            nullable=False,
+                            default=datetime.utcnow)
 
     # def get_reset_password_token(self, expires_sec=1800):
     #     """This creates a token needed to reset password via email.
@@ -155,6 +160,9 @@ class User(db.Model, UserMixin):
         subject = 'Password Reset Request'
         send_email(self.email, subject, html)
 
+    def verify_password(self, password_to_verify):
+        return bcrypt.check_password_hash(self.password, password_to_verify)
+
     def __repr__(self):
         return f"User({self.id}, '{self.email}', '{self.username}', '{self.password}')"
 
@@ -205,9 +213,13 @@ class Profile(db.Model):
         self.image = picture_file_name
 
     def delete_image(self):
-        if self.image:
+        if self.image != 'default.jpg':
             delete_image('static\profile_imgs', self.image)
-            self.image = None
+            self.image = 'default.jpg'
+
+    def set_default_image(self):
+        self.delete_image()
+        self.image = 'default.jpg'
 
     def __str__(self):
         return f"Profile({self.id}, '{self.user_id}', '{self.user}')"

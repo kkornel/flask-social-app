@@ -3,9 +3,13 @@ from flask import Blueprint, current_app, flash, redirect, render_template, requ
 from flask_login import current_user, login_user, logout_user, login_required
 
 from flaskapp import db, bcrypt
-from flaskapp.users.forms import LoginForm, RegistrationForm, RequestPasswordResetForm, ResetPasswordForm, UpdateProfileForm
+from flaskapp.users.forms import (LoginForm, RegistrationForm,
+                                  RequestPasswordResetForm, ResetPasswordForm,
+                                  UpdateProfileForm, ProfileUpdateForm,
+                                  ChangeEmailForm, ChangePasswordForm,
+                                  PasswordVerifyForm, ProfileDeleteForm)
 
-from flaskapp.decorators import prevent_authenticated
+from flaskapp.decorators import prevent_authenticated, is_owner_of_the_account
 from flaskapp.models.users import User, Profile
 
 users = Blueprint('users', __name__)
@@ -31,6 +35,9 @@ def register():
         user = User(email=form.email.data,
                     username=form.username.data,
                     password=hashed_password)
+        # TODO delete
+        user.active = True
+
         db.session.add(user)
         db.session.commit()
 
@@ -142,39 +149,153 @@ def reset_password_token(token):
                            form=form)
 
 
-@users.route('/profile/<string:username>/', methods=['GET', 'POST'])
+@users.route('/<string:username>/', methods=['GET'])
 @login_required
 def profile(username):
-    form = UpdateProfileForm()
+    profile = User.query.filter_by(username=username).all()[0].profile
+    return render_template('users/profile.html',
+                           title=username,
+                           profile=profile,
+                           posts=profile.posts)
+
+
+@users.route('/<string:username>/delete/', methods=['GET', 'POST'])
+@login_required
+@is_owner_of_the_account
+def delete_account(username):
+    form = PasswordVerifyForm()
     if form.validate_on_submit():
-        # We have to check because this field is not required.
+        return redirect(
+            url_for('users.delete_account_confirmation', username=username))
+    return render_template('users/profile_password_verify.html',
+                           title='Verify password',
+                           form=form)
+
+
+@users.route('/<string:username>/delete-confirmation/',
+             methods=['GET', 'POST'])
+@login_required
+@is_owner_of_the_account
+def delete_account_confirmation(username):
+    form = ProfileDeleteForm()
+    if form.validate_on_submit():
+        db.session.delete(current_user.profile)
+        db.session.commit()
+        flash('Your account has been deleted', 'danger')
+        return redirect(url_for('users.login'))
+    return render_template('users/profile_delete_confirm.html',
+                           title='Account deletion',
+                           form=form)
+
+
+@users.route('/<string:username>/password-change/', methods=['GET', 'POST'])
+@login_required
+@is_owner_of_the_account
+def password_change(username):
+    form = ChangePasswordForm()
+    if form.validate_on_submit():
+        if form.password.data:
+            hashed_password = bcrypt.generate_password_hash(
+                form.password.data).decode('utf-8')
+            current_user.password = hashed_password
+            db.session.commit()
+        flash('Your account has been updated!', 'success')
+        return redirect(
+            url_for('users.profile', username=current_user.username))
+    return render_template('users/profile_password_change.html',
+                           title='Change password',
+                           form=form)
+
+
+@users.route('/<string:username>/email-update/', methods=['GET', 'POST'])
+@login_required
+@is_owner_of_the_account
+def email_update(username):
+    form = ChangeEmailForm()
+    if form.validate_on_submit():
+        current_user.email = form.email.data
+        db.session.commit()
+        flash('Your account has been updated!', 'success')
+        return redirect(
+            url_for('users.profile', username=current_user.username))
+    elif request.method == 'GET':
+        form.email.data = current_user.email
+    return render_template('users/profile_email_update.html',
+                           title='Update email',
+                           form=form)
+
+
+@users.route('/<string:username>/update/', methods=['GET', 'POST'])
+@login_required
+@is_owner_of_the_account
+def edit_profile(username):
+    form = ProfileUpdateForm()
+    if form.validate_on_submit():
         if form.image.data:
             if current_user.profile.image:
                 current_user.profile.delete_image()
             current_user.profile.add_image(form.image.data)
+        if form.delete_current_image.data:
+            current_user.profile.set_default_image()
         current_user.username = form.username.data
-        current_user.email = form.email.data
-        hashed_password = bcrypt.generate_password_hash(
-            form.password.data).decode('utf-8')
-        current_user.password = hashed_password
+        current_user.profile.bio = form.bio.data
+        current_user.profile.city = form.city.data
+        current_user.profile.website = form.website.data
         db.session.commit()
         flash('Your account has been updated!', 'success')
-        # You want to use redirect here instead of fall down to render_template
-        # and the reason is of something called Post-Get-Redirect-Pattern
-        # If you ever reloaded a form after submiting a data
-        # and then a weird message comes "Are you sure you wanna reload?
-        # Because the data will be resubmited."
-        # That is because the browser is telling you that
-        # you about to run another POST request when you reload your page.
-        # So redirecting is causing to send a GET request
-        # and then we dont get that weird message.
-        return redirect(url_for('users.profile', current_user.username))
+        return redirect(
+            url_for('users.profile', username=current_user.username))
     elif request.method == 'GET':
         form.username.data = current_user.username
-        form.email.data = current_user.email
-    image = url_for('static',
-                    filename=f'profile_imgs/{current_user.profile.image}')
-    return render_template('users/profile.html',
-                           title='Profile',
-                           image=image,
+        form.bio.data = current_user.profile.bio
+        form.city.data = current_user.profile.city
+        form.website.data = current_user.profile.website
+    return render_template('users/profile_update.html',
+                           title='Update profile',
                            form=form)
+
+
+# Code for commented section in 'users/profile_update.html'
+# All fields (email, username, password, bio, ..., in one page)
+# @users.route('/<string:username>/update/', methods=['GET', 'POST'])
+# @login_required
+# @is_owner_of_the_account
+# def edit_profile(username):
+#     form = UpdateProfileForm()
+#     if form.validate_on_submit():
+#         # We have to check because this field is not required.
+#         if form.image.data:
+#             if current_user.profile.image:
+#                 current_user.profile.delete_image()
+#             current_user.profile.add_image(form.image.data)
+#         current_user.username = form.username.data
+#         current_user.email = form.email.data
+#         if form.password.data:
+#             hashed_password = bcrypt.generate_password_hash(
+#                 form.password.data).decode('utf-8')
+#             current_user.password = hashed_password
+#         current_user.profile.bio = form.bio.data
+#         current_user.profile.city = form.city.data
+#         current_user.profile.website = form.website.data
+#         db.session.commit()
+#         flash('Your account has been updated!', 'success')
+#         # You want to use redirect here instead of fall down to render_template
+#         # and the reason is of something called Post-Get-Redirect-Pattern
+#         # If you ever reloaded a form after submiting a data
+#         # and then a weird message comes "Are you sure you wanna reload?
+#         # Because the data will be resubmited."
+#         # That is because the browser is telling you that
+#         # you about to run another POST request when you reload your page.
+#         # So redirecting is causing to send a GET request
+#         # and then we dont get that weird message.
+#         return redirect(
+#             url_for('users.profile', username=current_user.username))
+#     elif request.method == 'GET':
+#         form.username.data = current_user.username
+#         form.email.data = current_user.email
+#         form.bio.data = current_user.profile.bio
+#         form.city.data = current_user.profile.city
+#         form.website.data = current_user.profile.website
+#     return render_template('users/profile_update.html',
+#                            title='Update profile',
+#                            form=form)

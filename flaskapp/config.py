@@ -17,6 +17,7 @@ class Config:
     # SQLALCHEMY_DATABASE_URI = 'postgresql://postgres:postgres@localhost/mt_flask_app'
     SQLALCHEMY_DATABASE_URI = os.environ.get(
         'MT_FLASK_SQLALCHEMY_DATABASE_URI')
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
     MAIL_SERVER = 'smtp.googlemail.com'
     MAIL_PORT = 587
     MAIL_USE_TLS = True

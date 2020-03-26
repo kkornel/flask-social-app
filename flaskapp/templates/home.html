@@ -7,13 +7,14 @@
         onmouseover="this.getElementsByClassName('my-post')[0].style.backgroundColor = '#15181c';"
         onmouseout=" this.getElementsByClassName('my-post')[0].style.backgroundColor='black';">
         <article class="media my-post">
-            <a href="{{ url_for('users.profile', username=current_user.username) }}">
+            <a href="{{ url_for('users.profile', username=post.author.user.username) }}">
                 <img class="rounded-circle post-author-img"
                     src="{{ url_for('static', filename='profile_imgs/' + post.author.image) }}">
             </a>
             <div class="media-body">
                 <div class="post-metadata">
-                    <a class="post-author-name" href="{{ url_for('users.profile', username=current_user.username) }}">
+                    <a class="post-author-name"
+                        href="{{ url_for('users.profile', username=post.author.user.username) }}">
                         {{ post.author.user.username }}
                     </a>
                     <span class="post-metadata-text ml-1 mr-1"> · </span>

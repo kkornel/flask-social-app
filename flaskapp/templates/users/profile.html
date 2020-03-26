@@ -1,87 +1,253 @@
 {% extends "base.html" %}
 
-{% block content %}
-<div class="col-sm-6 offset-sm-3 mt-3 block-content-borders">
-    <div class="media">
-        <img class="rounded-circle account-img" src="{{ image }}">
-        <div class="media-body">
-            <h2 class="account-heading">{{ current_user.username }}</h2>
-            <p class="text-secondary">{{ current_user.email }}</p>
+{% block stylesheets %}
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='profile.css') }}">
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='followers.css') }}">
+{% endblock stylesheets %}
+
+{% block content_center %}
+<div class="col-sm-7 main-column pt-0 pl-0 pr-0">
+    <div class="nav-back">
+        <span class="nav-back-span-icon">
+            <!-- <a href="javascript:history.back()" class="nav-back-span-a"> -->
+            <a href="{{ request.referrer }}" class="nav-back-span-a">
+                <i class="fas fa-arrow-left"></i>
+            </a>
+        </span>
+        <span class="nav-back-span-text">
+            {{ profile.user.username }}
+        </span>
+    </div>
+
+    <div class="pl-3 pr-3 mt-2">
+        <div class="media my-media">
+            <img class="profile-img" src="{{ url_for('static', filename='profile_imgs/' + profile.image) }}">
+            {% if current_user.profile == profile %}
+            <div>
+                <div class="dropdown my-dropdown">
+                    <a class="link-hover" data-toggle="dropdown">
+                        <i class="fas fa-cog dark-icon"></i>
+                    </a>
+                    <div class="dropdown-menu my-drop-menu">
+                        <span class="my-drop-menu-item-span">
+                            <a class="my-drop-menu-item dropdown-item change-email link-hover"
+                                href="{{ url_for('users.email_update', username=current_user.username) }}">
+                                {# data-id="{% url 'change-email' user.pk %}">#}
+                                Change email
+                            </a>
+                        </span>
+                        <span class="my-drop-menu-item-span">
+                            <a class="my-drop-menu-item dropdown-item "
+                                href="{{ url_for('users.password_change', username=current_user.username) }}">
+                                Change password
+                            </a>
+                        </span>
+                        <div class="dropdown-divider"></div>
+                        <div class="dropdown-divider"></div>
+                        <span class="my-drop-menu-item-span">
+                            <a class="my-drop-menu-item dropdown-item "
+                                href="{{ url_for('users.delete_account', username=current_user.username) }}">
+                                Delete an account
+                            </a>
+                        </span>
+                    </div>
+                </div>
+                <div class="edit-profile-button">
+                    <a class="edit-profile link-hover btn purple-btn"
+                        href="{{ url_for('users.edit_profile', username=current_user.username) }}">Edit
+                        profile</a>
+                </div>
+            </div>
+            {% endif %}
+
+            {% if current_user.is_authenticated and current_user.profile != profile %}
+            <div>
+                {% set is_following = is_already_following(current_user.profile.id, profile.id) %}
+
+                {% if is_following %}
+                <a id="follow-btn" class="link-hover btn purple-btn-outline"
+                    onclick="follow_user(event, '{{current_user.profile.pk}}', '{{profile.pk}}', '{{ csrf_token }}');">Following</a>
+                {% else %}
+                <a id="follow-btn" class="link-hover btn purple-btn"
+                    onclick="follow_user(event, '{{current_user.profile.pk}}', '{{profile.pk}}','{{ csrf_token }}');">Follow</a>
+                {% endif %}
+                </a>
+            </div>
+            {% endif %}
+        </div>
+        <div class="media-body mt-2 mb-2">
+            <div class="row">
+                <div class="col-2">
+                    <h2 class="account-heading"> {{ profile.user.username }}</h2>
+                </div>
+                <div class="col-10 content-center">
+                    <div class="mr-0 ml-0 row content-evenly" style="width: 100%;">
+                        <div>
+                            <a href="#posts" class="no-decoration">
+                                <span class="main-text-bold">{{ profile.posts|length }}</span>
+                                <span class="secondary-text"><small> posts</small></span>
+                            </a>
+                        </div>
+                        <div class="no-decoration link-hover">
+
+                            <a class="followers">
+                                {#<span id='followers-count' class="main-text-bold">{{ profile.followers|length }}</span>#}
+                                <span id='followers-count' class="main-text-bold">{{0 }}</span>
+                                <span class="secondary-text"><small> followers</small></span>
+                            </a>
+                        </div>
+                        <div class="no-decoration link-hover">
+                            <a class="following">
+                                {#<span id='following-count' class="main-text-bold">{{ profile.follows|length }}</span>#}
+                                <span id='following-count' class="main-text-bold">{{ 0 }}</span>
+                                <span class="secondary-text"><small> following</small></span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <p class="mb-1">{{ profile.bio|render_tags_and_links }}</p>
+
+            <div class="row content-between mr-0 ml-0 mb-0 mt-2">
+                {% if profile.city %}
+                <div class="row secondary-text ml-0 ">
+                    <i class="fas fa-map-marker-alt icon-position"></i>
+                    <a class="no-decoration mb-0" href="https://www.google.pl/maps/place/{{ profile.city }}"
+                        target="_blank">
+                        {{ profile.city }}
+                    </a>
+                </div>
+                {% else %}
+                <div></div>
+                <div></div>
+                {% endif %}
+                {% if profile.website %}
+                <div class="row secondary-text ml-0">
+                    <i class="fas fa-link icon-position"></i>
+                    <p class="mb-0">
+                        {{ profile.website|render_links }}
+                    </p>
+                </div>
+                {% else %}
+                <div></div>
+                {% endif %}
+                <div class="row secondary-text mr-0 ml-0">
+                    <i class="fas fa-calendar-alt icon-position"></i>
+                    <p class="mb-0">Joined {{ profile.user.date_joined.strftime('%B %Y') }}</p>
+                </div>
+            </div>
         </div>
     </div>
 
-    <form method="POST" action="" enctype="multipart/form-data">
-        {{ form.hidden_tag() }}
-        <fieldset class="form-group">
-            <legend class="border-bottom mb-4">Account Info</legend>
-            <div class="form-group">
-                {{ form.username.label(class="form-control-label") }}
+    <div class="my-horizontal-bar"></div>
 
-                {% if form.username.errors %}
-                {{ form.username(class="form-control is-invalid") }}
-                <div class="invalid-feedback">
-                    {% for error in form.username.errors %}
-                    <span>{{ error }}</span>
-                    {% endfor %}
-                </div>
-                {% else %}
-                {{ form.username(class="form-control") }}
-                {% endif %}
-            </div>
-            <div class="form-group">
-                {{ form.email.label(class="form-control-label") }}
-                {% if form.email.errors %}
-                {{ form.email(class="form-control is-invalid") }}
-                <div class="invalid-feedback">
-                    {% for error in form.email.errors %}
-                    <span>{{ error }}</span>
-                    {% endfor %}
-                </div>
-                {% else %}
-                {{ form.email(class="form-control") }}
-                {% endif %}
-            </div>
-            <div class="form-group">
-                {{ form.password.label(class="form-control-label") }}
+    <div id="posts"></div>
+    {% for post in posts %}
+    <div onclick="location.href='/post/{{ post.id }}/';" style="cursor: pointer; "
+        onmouseover="this.getElementsByClassName('my-post')[0].style.backgroundColor = '#15181c';"
+        onmouseout=" this.getElementsByClassName('my-post')[0].style.backgroundColor='black';">
+        <article class="media my-post">
+            <a href="{{ url_for('users.profile', username=post.author.user.username) }}">
+                <img class="rounded-circle post-author-img"
+                    src="{{ url_for('static', filename='profile_imgs/' + post.author.image) }}">
+            </a>
+            <div class="media-body">
+                <div class="post-metadata">
+                    <a class="post-author-name"
+                        href="{{ url_for('users.profile', username=post.author.user.username) }}">
+                        {{ post.author.user.username }}
+                    </a>
+                    <span class="post-metadata-text ml-1 mr-1"> · </span>
+                    {% if post.location %}
+                    <!-- <a class="post-metadata-text mr-2" href="https://www.google.pl/maps/place/{{ post.location }}">
+                        {{ post.location }}
+                    </a> -->
+                    <span class="post-metadata-text no-decoration">
+                        <a target="_blank"
+                            onclick="openInNewTab(event, 'https:\/\/www.google.pl/maps/place/{{ post.location }}');">
+                            {{ post.location }}
+                        </a>
+                    </span>
+                    <span class="post-metadata-text ml-1 mr-1"> · </span>
+                    {% endif %}
 
-                {% if form.password.errors %}
-                {{ form.password(class="form-control is-invalid") }}
-                <div class="invalid-feedback">
-                    {% for error in form.password.errors %}
-                    <span> {{ error }}</span>
-                    {% endfor %}
-                </div>
-                {% else %}
-                {{ form.password(class="form-control") }}
-                {% endif %}
-            </div>
-            <div class="form-group">
-                {{ form.confirm_password.label(class="form-control-label") }}
+                    <span class="post-metadata-text">
+                        {{ post.date_posted|time_since_date_posted }}
+                    </span>
 
-                {% if form.confirm_password.errors %}
-                {{ form.confirm_password(class="form-control is-invalid") }}
-                <div class="invalid-feedback">
-                    {% for error in form.confirm_password.errors %}
-                    <span> {{ error }}</span>
-                    {% endfor %}
+                    {% if current_user.profile == post.author %}
+                    <span class="dropdown" style="float: right;">
+                        <a class="link-hover dropdown-arrow" data-toggle="dropdown" id="post{{post.pk}}"
+                            onclick="stopPropagationForGivenPost(event, this.id);">
+                            <i class="fa fa-chevron-down dark-icon" aria-hidden="true"></i>
+                        </a>
+                        <div class="dropdown-menu my-drop-menu">
+                            <a class="dropdown-item my-drop-menu-item"
+                                href="{{ url_for('social.post_update', post_id=post.id) }}">Edit</a>
+                            <span class="my-drop-menu-item-span">
+                                <a class="my-drop-menu-item dropdown-item edit-post link-hover">
+                                    {#data-id="{% url 'post-update-modal' post.pk %}" onclick="stopPropagation(event);">#}
+                                    Edit Modal
+                                </a>
+                            </span>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item my-drop-menu-item"
+                                href="{{ url_for('social.post_delete', post_id=post.id) }}">Delete</a>
+                            <span class="my-drop-menu-item-span">
+                                <a class="dropdown-item delete-post link-hover my-drop-menu-item">
+                                    {# data-id="{% url 'post-delete-modal' post.pk %}" onclick="stopPropagation(event);">#}
+                                    Delete Modal
+                                </a>
+                            </span>
+                        </div>
+                    </span>
+                    {% endif %}
                 </div>
-                {% else %}
-                {{ form.confirm_password(class="form-control") }}
+
+                <p class="article-content post-content">
+                    {{ post.content|render_tags_and_links }}
+                </p>
+
+                {% if post.image %}
+                <img class="post-image" src="{{ url_for('static', filename='posts_imgs/' + post.image) }}">
                 {% endif %}
+
+                <div class="post-likes-panel">
+                    <div class="align-right">
+                        <div class="row">
+                            <div>
+                                {% set has_commented = has_user_commented(post.id) %}
+                                <a id="post-comment-{{post.id}}"
+                                    href="{{ url_for('social.post_detail', post_id=post.id) }}#comments"
+                                    class="col-sec mr-2 post-detail-likes-panel {% if has_commented %}commented{% else %}comment{% endif %}"
+                                    onmouseover="$('#' + this.id).addClass('hvr-icon-wobble-horizontal');"
+                                    onmouseout="$('#' + this.id).removeClass('hvr-icon-wobble-horizontal');">
+                                    <i class="far fa-comment hvr-icon"></i>
+                                    <small>{{ post.comments|length }}</small>
+                                </a>
+                            </div>
+                            <div>
+                                <a id="post-like-{{post.id}}" href="javascript:void(0);"
+                                    class="post-detail-likes-panel {% if current_user.profile in post.likes %}liked{% else %}heart{% endif %}"
+                                    onclick="send_like(event, '{{post.id}}', '{{current_user.profile.id}}', this.id);"
+                                    onmouseover="$('#' + this.id).addClass('hvr-icon-pulse-shrink');"
+                                    onmouseout="$('#' + this.id).removeClass('hvr-icon-pulse-shrink');">
+                                    <i class="far fa-heart hvr-icon"></i>
+                                    <small id="post-likes-count">{{ post.likes|length }}</small>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="form-group">
-                {{ form.image.label() }}
-                {{ form.image(class="form-control-file") }}
-                {% if form.image.errors %}
-                {% for error in form.image.errors %}
-                <span class="text-danger">{{ error }}</span></br>
-                {% endfor %}
-                {% endif %}
-            </div>
-        </fieldset>
-        <div class="form-group">
-            {{ form.submit(class="btn purple-btn") }}
-        </div>
-    </form>
+        </article>
+    </div>
+    <div class="my-horizontal-bar"></div>
+    {% else %}
+    <div class="content-center" style="margin-top: 32px;">
+        <p>User has no posts.</p>
+    </div>
+    {% endfor %}
 </div>
-{% endblock content %}
+{% endblock content_center %}
