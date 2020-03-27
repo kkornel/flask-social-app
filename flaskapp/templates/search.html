@@ -1,0 +1,154 @@
+{% extends "base.html" %}
+
+{% block stylesheets %}
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='profile.css') }}">
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='followers.css') }}">
+{% endblock stylesheets %}
+
+{% block content_center %}
+<div class="col-md-7 main-column pr-0 pl-0">
+    {% for result in results %}
+
+    {% if result|get_class == 'Post' %}
+    <div onclick="location.href='/post/{{ result.id }}/';" style="cursor: pointer; "
+        onmouseover="this.getElementsByClassName('my-post')[0].style.backgroundColor = '#15181c';"
+        onmouseout=" this.getElementsByClassName('my-post')[0].style.backgroundColor='black';">
+        <article class="media my-post">
+            <a href="{{ url_for('users.profile', username=result.author.user.username) }}">
+                <img class="rounded-circle post-author-img"
+                    src="{{ url_for('static', filename='profile_imgs/' + result.author.image) }}">
+            </a>
+            <div class="media-body">
+                <div class="post-metadata">
+                    <a class="post-author-name"
+                        href="{{ url_for('users.profile', username=result.author.user.username) }}">
+                        {{ result.author.user.username }}
+                    </a>
+                    <span class="post-metadata-text ml-1 mr-1"> · </span>
+                    {% if result.location %}
+
+                    <span class="post-metadata-text no-decoration">
+                        <a target="_blank"
+                            onclick="openInNewTab(event, 'https:\/\/www.google.pl/maps/place/{{ result.location }}');">
+                            {{ result.location }}
+                        </a>
+                    </span>
+                    <span class="post-metadata-text ml-1 mr-1"> · </span>
+                    {% endif %}
+
+                    <span class="post-metadata-text">
+                        {{ result.date_posted|time_since_date_posted }}
+                    </span>
+
+                    {% if current_user.profile == result.author %}
+                    <span class="dropdown" style="float: right;">
+                        <a class="link-hover dropdown-arrow" data-toggle="dropdown" id="post{{result.id}}"
+                            onclick="stopPropagationForGivenPost(event, this.id);">
+                            <i class="fa fa-chevron-down dark-icon" aria-hidden="true"></i>
+                        </a>
+                        <div class="dropdown-menu my-drop-menu">
+                            <a class="dropdown-item my-drop-menu-item"
+                                href="{{ url_for('social.post_update', post_id=result.id) }}">Edit</a>
+                            <span class="my-drop-menu-item-span">
+                                <a class="my-drop-menu-item dropdown-item edit-post link-hover">
+                                    Edit Modal
+                                </a>
+                            </span>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item my-drop-menu-item"
+                                href="{{ url_for('social.post_delete', post_id=result.id) }}">Delete</a>
+                            <span class="my-drop-menu-item-span">
+                                <a class="dropdown-item delete-post link-hover my-drop-menu-item">
+                                    Delete Modal
+                                </a>
+                            </span>
+                        </div>
+                    </span>
+                    {% endif %}
+                </div>
+
+                <p class="article-content post-content">
+                    {{ result.content|render_tags_and_links }}
+                </p>
+
+                {% if result.image %}
+                <img class="post-image" src="{{ url_for('static', filename='posts_imgs/' + result.image) }}">
+                {% endif %}
+
+                <div class="post-likes-panel">
+                    <div class="align-right">
+                        <div class="row">
+                            <div>
+                                {% set has_commented = has_user_commented(result.id) %}
+                                <a id="post-comment-{{result.id}}"
+                                    href="{{ url_for('social.post_detail', post_id=result.id) }}#comments"
+                                    class="col-sec mr-2 post-detail-likes-panel {% if has_commented %}commented{% else %}comment{% endif %}"
+                                    onmouseover="$('#' + this.id).addClass('hvr-icon-wobble-horizontal');"
+                                    onmouseout="$('#' + this.id).removeClass('hvr-icon-wobble-horizontal');">
+                                    <i class="far fa-comment hvr-icon"></i>
+                                    <small>{{ result.comments|length }}</small>
+                                </a>
+                            </div>
+                            <div>
+                                <a id="post-like-{{result.id}}" href="javascript:void(0);"
+                                    class="post-detail-likes-panel {% if current_user.profile in result.likes %}liked{% else %}heart{% endif %}"
+                                    onclick="send_like(event, '{{result.id}}', '{{current_user.profile.id}}', this.id);"
+                                    onmouseover="$('#' + this.id).addClass('hvr-icon-pulse-shrink');"
+                                    onmouseout="$('#' + this.id).removeClass('hvr-icon-pulse-shrink');">
+                                    <i class="far fa-heart hvr-icon"></i>
+                                    <small id="post-likes-count">{{ result.likes|length }}</small>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </article>
+    </div>
+    <div class="my-horizontal-bar"></div>
+
+    {% elif result|get_class == 'User' %}
+    <div onclick="location.href='/{{ result.username }}/';" style="cursor: pointer; "
+        onmouseover="this.getElementsByClassName('my-post')[0].style.backgroundColor = '#15181c';"
+        onmouseout=" this.getElementsByClassName('my-post')[0].style.backgroundColor='black';">
+        <article class="media my-post">
+            <a href="{{ url_for('users.profile', username=result.username) }}">
+                <img class="rounded-circle post-author-img"
+                    src="{{ url_for('static', filename='profile_imgs/' + result.profile.image) }}">
+            </a>
+            <div class="media-body">
+                <div class="pt-2">
+                    <h2 class="account-heading">
+                        <a class="follower-author-name" href="{{ url_for('users.profile', username=result.username) }}">
+                            {{ result.username }}
+                        </a>
+                    </h2>
+                </div>
+            </div>
+            {% if current_user.is_authenticated and current_user.profile != result.profile %}
+            <div class='pt-3'>
+                {% set is_following = is_already_following(current_user.profile.id, result.profile.id) %}
+
+                {% if is_following %}
+                <a id="follow-btn" class="link-hover btn purple-btn-outline"
+                    onclick="follow_user(event, '{{current_user.profile.id}}', '{{result.profile.id}}');">Following</a>
+                {% else %}
+                <a id="follow-btn" class="link-hover btn purple-btn"
+                    onclick="follow_user(event, '{{current_user.profile.id}}', '{{result.profile.id}}');">Follow</a>
+                {% endif %}
+                </a>
+            </div>
+            {% endif %}
+        </article>
+    </div>
+    <div class="my-horizontal-bar"></div>
+
+    {% endif %}
+
+    {% else %}
+    <div class="content-center" style="margin-top: 32px;">
+        <p>No results.</p>
+    </div>
+    {% endfor %}
+</div>
+{% endblock content_center %}

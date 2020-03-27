@@ -1,13 +1,13 @@
 import datetime
 import re
 
-from flask import Blueprint, render_template, request, make_response, current_app as app, Markup
+from flask import Blueprint, render_template, request, make_response, current_app as app, Markup, redirect, url_for, session
 
 from flask_login import current_user, login_required
 
 from flaskapp.utils import generate_hashtag_link, generate_link
 from flaskapp.models.social import Post, Comment
-from flaskapp.models.users import Profile
+from flaskapp.models.users import Profile, User
 
 main = Blueprint('main', __name__)
 
@@ -34,6 +34,27 @@ def home():
                            posts=posts)
 
 
+@main.route('/search/', methods=['POST'])
+def search():
+    results = []
+    query = request.form['q']
+    queries = query.split(' ')
+    for q in queries:
+        q = "%{}%".format(q)
+        users = User.query.filter(User.username.ilike(q)).distinct(
+            User.username).all()
+        for user in users:
+            results.append(user)
+        posts = Post.query.filter(
+            Post.content.ilike(q) | Post.location.ilike(q)).distinct(
+                Post.id).all()
+        for post in posts:
+            results.append(post)
+    return render_template('search.html',
+                           title=f'Search {query}',
+                           results=list(set(results)))
+
+
 @main.app_template_filter('render_tags_and_links')
 def _render_tags_and_links(obj):
     if obj == None:
@@ -58,6 +79,11 @@ def _render_links(obj):
         re.sub(
             r"((http|https)\:\/\/)?[a-zA-Z0-9\.\/\?\:@\-_=#]+\.([a-zA-Z]){2,6}([a-zA-Z0-9\.\&\/\?\:@\-_=#])*",
             lambda m: generate_link(m.group(0)), obj))
+
+
+@main.app_template_filter('get_class')
+def _get_class(value):
+    return value.__class__.__name__
 
 
 @main.app_template_filter('time_since_date_posted')
