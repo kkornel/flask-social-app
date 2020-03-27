@@ -6,6 +6,130 @@
 {% endblock stylesheets %}
 
 {% block content_center %}
+<div class="modal fade" id="followedModal" tabindex="-1" role="dialog" aria-labelledby="followedModalTitle"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content my-modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Follows:</h5>
+                <a class="delete-comment link-hover" data-dismiss="modal">
+                    <i class="fas fa-times light-icon "></i>
+                </a>
+            </div>
+            <div class="modal-body">
+                {% for follow in profile.followed.all() %}
+                <div class="follower-borders">
+                    <article class="media">
+                        <span class="follower-img-sm-span">
+                            <a href="{{ url_for('users.profile', username=follow.user.username) }}">
+                                <img class="rounded-circle follower-img-sm"
+                                    src="{{ url_for('static', filename='profile_imgs/' + follow.image) }}">
+                            </a>
+                        </span>
+                        <div class="media-body">
+                            <div class="pt-1">
+                                <h2 class="account-heading">
+                                    <a class="follower-author-name"
+                                        href="{{ url_for('users.profile', username=follow.user.username) }}">
+                                        {{ follow.user.username }}
+                                    </a>
+                                </h2>
+                            </div>
+                        </div>
+                        <div class="pt-2 pl-2 ml-2">
+                            {% if current_user.is_authenticated and current_user.profile != follow %}
+                            <div>
+                                {% set is_following = is_already_following(current_user.profile.id, follow.id) %}
+
+                                {% if is_following %}
+                                <a id="follow-btn" class="link-hover btn purple-btn-outline"
+                                    onclick="follow_user(event, '{{current_user.profile.id}}', '{{follow.id}}');">Following</a>
+                                {% else %}
+                                <a id="follow-btn" class="link-hover btn purple-btn"
+                                    onclick="follow_user(event, '{{current_user.profile.id}}', '{{follow.id}}');">Follow</a>
+                                {% endif %}
+                                </a>
+                            </div>
+                            {% endif %}
+                            </a>
+                        </div>
+                    </article>
+                </div>
+                {% else %}
+                <div class="content-center" style="margin-top: 32px;">
+                    <p>No followers.</p>
+                </div>
+                {% endfor %}
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="followersModal" tabindex="-1" role="dialog" aria-labelledby="followersModalTitle"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content my-modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Followed by:</h5>
+                <a class="delete-comment link-hover" data-dismiss="modal">
+                    <i class="fas fa-times light-icon "></i>
+                </a>
+            </div>
+            <div class="modal-body">
+                {% for follow in profile.followers.all() %}
+                <div class="follower-borders">
+                    <article class="media">
+                        <span class="follower-img-sm-span">
+                            <a href="{{ url_for('users.profile', username=follow.user.username) }}">
+                                <img class="rounded-circle follower-img-sm"
+                                    src="{{ url_for('static', filename='profile_imgs/' + follow.image) }}">
+                            </a>
+                        </span>
+                        <div class="media-body">
+                            <div class="pt-1">
+                                <h2 class="account-heading">
+                                    <a class="follower-author-name"
+                                        href="{{ url_for('users.profile', username=follow.user.username) }}">
+                                        {{ follow.user.username }}
+                                    </a>
+                                </h2>
+                            </div>
+                        </div>
+                        <div class="pt-2 pl-2 ml-2">
+                            {% if current_user.is_authenticated and current_user.profile != follow %}
+                            <div>
+                                {% set is_following = is_already_following(current_user.profile.id, follow.id) %}
+
+                                {% if is_following %}
+                                <a id="follow-btn" class="link-hover btn purple-btn-outline"
+                                    onclick="follow_user(event, '{{current_user.profile.id}}', '{{follow.id}}');">Following</a>
+                                {% else %}
+                                <a id="follow-btn" class="link-hover btn purple-btn"
+                                    onclick="follow_user(event, '{{current_user.profile.id}}', '{{follow.id}}');">Follow</a>
+                                {% endif %}
+                                </a>
+                            </div>
+                            {% endif %}
+                            </a>
+                        </div>
+                    </article>
+                </div>
+                {% else %}
+                <div class="content-center" style="margin-top: 32px;">
+                    <p>No followers.</p>
+                </div>
+                {% endfor %}
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <div class="col-sm-7 main-column pt-0 pl-0 pr-0">
     <div class="nav-back">
         <span class="nav-back-span-icon">
@@ -18,7 +142,6 @@
             {{ profile.user.username }}
         </span>
     </div>
-
     <div class="pl-3 pr-3 mt-2">
         <div class="media my-media">
             <img class="profile-img" src="{{ url_for('static', filename='profile_imgs/' + profile.image) }}">
@@ -65,10 +188,10 @@
                 {% set is_following = is_already_following(current_user.profile.id, profile.id) %}
 
                 {% if is_following %}
-                <a id="follow-btn" class="link-hover btn purple-btn-outline"
+                <a id="follow-btn" class="link-hover btn purple-btn-outline follow-btn"
                     onclick="follow_user(event, '{{current_user.profile.id}}', '{{profile.id}}');">Following</a>
                 {% else %}
-                <a id="follow-btn" class="link-hover btn purple-btn"
+                <a id="follow-btn" class="link-hover btn purple-btn follow-btn"
                     onclick="follow_user(event, '{{current_user.profile.id}}', '{{profile.id}}');">Follow</a>
                 {% endif %}
                 </a>
@@ -89,14 +212,13 @@
                             </a>
                         </div>
                         <div class="no-decoration link-hover">
-
-                            <a class="followers">
+                            <a class="followers" data-toggle="modal" data-target="#followersModal">
                                 <span id='followers-count' class="main-text-bold">{{ profile.followers.count() }}</span>
                                 <span class="secondary-text"><small> followers</small></span>
                             </a>
                         </div>
                         <div class="no-decoration link-hover">
-                            <a class="following">
+                            <a class="following" data-toggle="modal" data-target="#followedModal">
                                 <span id='following-count' class="main-text-bold">{{ profile.followed.count() }}</span>
                                 <span class="secondary-text"><small> following</small></span>
                             </a>

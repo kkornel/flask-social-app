@@ -11,6 +11,9 @@ from sqlalchemy import event
 from flaskapp import db, login_manager, bcrypt
 from flaskapp.utils import delete_image, save_image
 from flaskapp.users.utils import send_email
+from flaskapp.models.social import Post
+
+from sqlalchemy import or_
 
 
 # https://flask-login.readthedocs.io/en/latest/
@@ -241,6 +244,7 @@ class Profile(db.Model):
     def follow(self, user):
         if not self.is_following(user):
             self.followed.append(user)
+            self.followed_posts()
 
     def unfollow(self, user):
         if self.is_following(user):
@@ -249,6 +253,19 @@ class Profile(db.Model):
     def is_following(self, user):
         return self.followed.filter(
             followers.c.followed_id == user.id).count() > 0
+
+    def followed_posts(self):
+        return Post.query.join(
+            followers, (followers.c.followed_id == Post.author_id)).filter(
+                followers.c.follower_id == self.id).order_by(
+                    Post.date_posted.desc()).all()
+
+    def user_and_followed_posts(self):
+        return Post.query.join(
+            followers, (followers.c.followed_id == Post.author_id)).filter(
+                or_(followers.c.follower_id == self.id,
+                    Post.author_id == self.id)).order_by(
+                        Post.date_posted.desc()).all()
 
     def __str__(self):
         return f"Profile({self.id}, '{self.user_id}', '{self.user}')"

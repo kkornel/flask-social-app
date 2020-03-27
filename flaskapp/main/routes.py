@@ -28,7 +28,9 @@ def home():
         render_template('home.html', title='Master Thesis Flask'))
     response.headers['Content-Security-Policy'] = "default-src 'self'"
     # return response
-    posts = Post.query.order_by(Post.date_posted.desc())
+    # posts = Post.query.order_by(Post.date_posted.desc())
+    posts = current_user.profile.user_and_followed_posts()
+
     return render_template('home.html',
                            title='Master Thesis Flask',
                            posts=posts)

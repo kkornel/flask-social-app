@@ -24,9 +24,13 @@ function send_like(event, post_id, profile_id, a_id) {
 
 function follow_user(event, follower_id, followed_id) {
     const aHrefFollow = $('#follow-btn');
+    const aHrefFollowa = $('.follow-btn');
     aHrefFollow.toggleClass("purple-btn-outline");
+    aHrefFollowa.toggleClass("purple-btn-outline");
     aHrefFollow.toggleClass("purple-btn");
+    aHrefFollowa.toggleClass("purple-btn");
     aHrefFollow.text((aHrefFollow.text() == 'Follow') ? 'Following' : 'Follow');
+    aHrefFollowa.text((aHrefFollowa.text() == 'Follow') ? 'Following' : 'Follow');
     $.ajax({
         url: '/follow/',
         type: 'POST',
