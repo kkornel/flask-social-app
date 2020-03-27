@@ -341,27 +341,13 @@ a.nav-back-span-a:hover {
 .purple-btn-outline {
   border: 1px solid #865dca;
   background-color: #000000;
-  color: #865dca;
-}
-
-.purple-btn-outline-modal {
-  border: 1px solid #865dca;
-  background-color:#15181c;
-  color: #865dca;
+  color: #865dca !important;
 }
 
 .purple-btn-outline:hover {
   background-color: #865dca;
-  color: #ffffff;
+  color: #ffffff !important;
 }
-
-.purple-btn-outline-modal:hover {
-  background-color: #865dca;
-  color: #ffffff;
-}
-
-
-
 
 /* Icon Wobble Horizontal */
 @-webkit-keyframes hvr-icon-wobble-horizontal {

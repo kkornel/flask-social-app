@@ -27,7 +27,7 @@
                             </a>
                         </span>
                         <div class="media-body">
-                            <div class="pt-1">
+                            <div class="ml-2">
                                 <h2 class="account-heading">
                                     <a class="follower-author-name"
                                         href="{{ url_for('users.profile', username=follow.user.username) }}">
@@ -36,17 +36,17 @@
                                 </h2>
                             </div>
                         </div>
-                        <div class="pt-2 pl-2 ml-2">
+                        <div class="pt-2 pl-2 mr-2">
                             {% if current_user.is_authenticated and current_user.profile != follow %}
                             <div>
                                 {% set is_following = is_already_following(current_user.profile.id, follow.id) %}
 
                                 {% if is_following %}
-                                <a id="follow-btn" class="link-hover btn purple-btn-outline"
-                                    onclick="follow_user(event, '{{current_user.profile.id}}', '{{follow.id}}');">Following</a>
+                                <a id="followed-btn-modal-{{follow.id}}" class="link-hover btn purple-btn-outline-modal"
+                                    onclick="follow_user(event, '{{current_user.profile.id}}', '{{follow.id}}', true, this.id);">Following</a>
                                 {% else %}
-                                <a id="follow-btn" class="link-hover btn purple-btn"
-                                    onclick="follow_user(event, '{{current_user.profile.id}}', '{{follow.id}}');">Follow</a>
+                                <a id="followed-btn-modal-{{follow.id}}" class="link-hover btn purple-btn"
+                                    onclick="follow_user(event, '{{current_user.profile.id}}', '{{follow.id}}', true, this.id);">Follow</a>
                                 {% endif %}
                                 </a>
                             </div>
@@ -57,12 +57,13 @@
                 </div>
                 {% else %}
                 <div class="content-center" style="margin-top: 32px;">
-                    <p>No followers.</p>
+                    <p>No follows.</p>
                 </div>
                 {% endfor %}
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-outline-secondary" onClick="window.location.reload();"
+                    data-dismiss="modal">Close</button>
             </div>
         </div>
     </div>
@@ -98,17 +99,18 @@
                                 </h2>
                             </div>
                         </div>
-                        <div class="pt-2 pl-2 ml-2">
+                        <div class="pt-2 pl-2 mr-2">
                             {% if current_user.is_authenticated and current_user.profile != follow %}
                             <div>
                                 {% set is_following = is_already_following(current_user.profile.id, follow.id) %}
 
                                 {% if is_following %}
-                                <a id="follow-btn" class="link-hover btn purple-btn-outline"
-                                    onclick="follow_user(event, '{{current_user.profile.id}}', '{{follow.id}}');">Following</a>
+                                <a id="followers-btn-modal-{{follow.id}}"
+                                    class="link-hover btn purple-btn-outline-modal"
+                                    onclick="follow_user(event, '{{current_user.profile.id}}', '{{follow.id}}', true, this.id);">Following</a>
                                 {% else %}
-                                <a id="follow-btn" class="link-hover btn purple-btn"
-                                    onclick="follow_user(event, '{{current_user.profile.id}}', '{{follow.id}}');">Follow</a>
+                                <a id="followers-btn-modal-{{follow.id}}" class="link-hover btn purple-btn"
+                                    onclick="follow_user(event, '{{current_user.profile.id}}', '{{follow.id}}', true, this.id);">Follow</a>
                                 {% endif %}
                                 </a>
                             </div>
@@ -124,7 +126,8 @@
                 {% endfor %}
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-outline-secondary" onClick="window.location.reload();"
+                    data-dismiss="modal">Close</button>
             </div>
         </div>
     </div>
@@ -133,7 +136,6 @@
 <div class="col-sm-7 main-column pt-0 pl-0 pr-0">
     <div class="nav-back">
         <span class="nav-back-span-icon">
-            <!-- <a href="javascript:history.back()" class="nav-back-span-a"> -->
             <a href="{{ request.referrer }}" class="nav-back-span-a">
                 <i class="fas fa-arrow-left"></i>
             </a>
@@ -155,7 +157,6 @@
                         <span class="my-drop-menu-item-span">
                             <a class="my-drop-menu-item dropdown-item change-email link-hover"
                                 href="{{ url_for('users.email_update', username=current_user.username) }}">
-                                {# data-id="{% url 'change-email' user.pk %}">#}
                                 Change email
                             </a>
                         </span>
@@ -188,13 +189,12 @@
                 {% set is_following = is_already_following(current_user.profile.id, profile.id) %}
 
                 {% if is_following %}
-                <a id="follow-btn" class="link-hover btn purple-btn-outline follow-btn"
-                    onclick="follow_user(event, '{{current_user.profile.id}}', '{{profile.id}}');">Following</a>
+                <a id="follow-btn" class="link-hover btn purple-btn-outline"
+                    onclick="follow_user(event, '{{current_user.profile.id}}', '{{profile.id}}', false, this.id);">Following</a>
                 {% else %}
-                <a id="follow-btn" class="link-hover btn purple-btn follow-btn"
-                    onclick="follow_user(event, '{{current_user.profile.id}}', '{{profile.id}}');">Follow</a>
+                <a id="follow-btn" class="link-hover btn purple-btn"
+                    onclick="follow_user(event, '{{current_user.profile.id}}', '{{profile.id}}', false, this.id);">Follow</a>
                 {% endif %}
-                </a>
             </div>
             {% endif %}
         </div>
@@ -280,9 +280,6 @@
                     </a>
                     <span class="post-metadata-text ml-1 mr-1"> · </span>
                     {% if post.location %}
-                    <!-- <a class="post-metadata-text mr-2" href="https://www.google.pl/maps/place/{{ post.location }}">
-                        {{ post.location }}
-                    </a> -->
                     <span class="post-metadata-text no-decoration">
                         <a target="_blank"
                             onclick="openInNewTab(event, 'https:\/\/www.google.pl/maps/place/{{ post.location }}');">
@@ -298,19 +295,13 @@
 
                     {% if current_user.profile == post.author %}
                     <span class="dropdown" style="float: right;">
-                        <a class="link-hover dropdown-arrow" data-toggle="dropdown" id="post{{post.pk}}"
+                        <a class="link-hover dropdown-arrow" data-toggle="dropdown" id="post{{post.id}}"
                             onclick="stopPropagationForGivenPost(event, this.id);">
                             <i class="fa fa-chevron-down dark-icon" aria-hidden="true"></i>
                         </a>
                         <div class="dropdown-menu my-drop-menu">
                             <a class="dropdown-item my-drop-menu-item"
                                 href="{{ url_for('social.post_update', post_id=post.id) }}">Edit</a>
-                            <span class="my-drop-menu-item-span">
-                                <a class="my-drop-menu-item dropdown-item edit-post link-hover">
-                                    {#data-id="{% url 'post-update-modal' post.pk %}" onclick="stopPropagation(event);">#}
-                                    Edit Modal
-                                </a>
-                            </span>
                             <div class="dropdown-divider"></div>
                             <a class="dropdown-item my-drop-menu-item"
                                 href="{{ url_for('social.post_delete', post_id=post.id) }}">Delete</a>

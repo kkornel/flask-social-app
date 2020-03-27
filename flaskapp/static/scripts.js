@@ -22,15 +22,15 @@ function send_like(event, post_id, profile_id, a_id) {
     event.stopImmediatePropagation();
 }
 
-function follow_user(event, follower_id, followed_id) {
-    const aHrefFollow = $('#follow-btn');
-    const aHrefFollowa = $('.follow-btn');
-    aHrefFollow.toggleClass("purple-btn-outline");
-    aHrefFollowa.toggleClass("purple-btn-outline");
+function follow_user(event, follower_id, followed_id, is_from_modal, a_id) {
+    const aHrefFollow = $('#' + a_id);
+    if (is_from_modal) {
+        aHrefFollow.toggleClass("purple-btn-outline-modal");
+    } else {
+        aHrefFollow.toggleClass("purple-btn-outline");
+    }
     aHrefFollow.toggleClass("purple-btn");
-    aHrefFollowa.toggleClass("purple-btn");
     aHrefFollow.text((aHrefFollow.text() == 'Follow') ? 'Following' : 'Follow');
-    aHrefFollowa.text((aHrefFollowa.text() == 'Follow') ? 'Following' : 'Follow');
     $.ajax({
         url: '/follow/',
         type: 'POST',
@@ -39,6 +39,9 @@ function follow_user(event, follower_id, followed_id) {
             'followed_id': followed_id,
         },
         success: function (data) {
+            if (is_from_modal) {
+                return
+            }
             console.log(data);
             followers = data.followers
             following = data.following
