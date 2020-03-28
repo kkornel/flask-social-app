@@ -1,5 +1,5 @@
 from flask import current_app as app
-from flask import Blueprint, current_app, flash, redirect, render_template, request, url_for
+from flask import Blueprint, current_app, flash, redirect, render_template, request, url_for, abort
 from flask_login import current_user, login_user, logout_user, login_required
 
 from flaskapp import db, bcrypt
@@ -152,6 +152,9 @@ def reset_password_token(token):
 @users.route('/<string:username>/', methods=['GET'])
 @login_required
 def profile(username):
+    user = User.query.filter_by(username=username).first()
+    if not user:
+        abort(404)
     profile = User.query.filter_by(username=username).all()[0].profile
     return render_template('users/profile.html',
                            title=username,
