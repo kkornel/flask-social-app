@@ -55,6 +55,49 @@ function follow_user(event, follower_id, followed_id, is_from_modal, a_id) {
     event.stopImmediatePropagation();
 }
 
+function delete_comment_or_post(that, event, what_to_delete) {
+    console.log(what_to_delete);
+    let title = '';
+    let content = '';
+    if (what_to_delete == 'post') {
+        title = 'Delete post';
+        content = 'Are you sure you want to this post?';
+    } else if (what_to_delete == 'comment') {
+        title = 'Delete comment';
+        content = 'Are you sure you want to this comment?';
+    }
+    var object_to_delete_id = $(that).data('id');
+    console.log(object_to_delete_id)
+    $('#modalDeleteTitle').text(title);
+    $('#modalDeleteContent').text(content);
+    $('#deletePostModal').modal('show');
+    $(".modal-body #objtectToDeleteId").val(what_to_delete + '-' + object_to_delete_id);
+    stopPropagation(event);
+};
+
+function send_request_to_delete_object() {
+    var object_to_delete_id = $(".modal-body #objtectToDeleteId").val();
+    console.log(object_to_delete_id);
+
+    $.ajax({
+        url: '/delete_comment_or_post/',
+        type: 'POST',
+        data: {
+            'object_to_delete_id': object_to_delete_id,
+        },
+        success: function (data) {
+            console.log(data);
+            $('#deletePostModal').modal('hide');
+            window.location.reload();
+        },
+        error: function (data) {
+            console.log(data);
+            $('#deletePostModal').modal('hide');
+            window.location.reload();
+        },
+    });
+};
+
 function openInNewTab(event, url) {
     var win = window.open(url, '_blank');
     win.focus();

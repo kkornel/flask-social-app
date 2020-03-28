@@ -74,6 +74,29 @@
         </div>
     </nav>
 
+    <div class="modal fade" id="deletePostModal" tabindex="-1" role="dialog" aria-labelledby="deletePostModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content my-modal-content">
+                <div class="modal-header">
+                    <h4 id="modalDeleteTitle" class="modal-title"></h4>
+                    <a class="delete-comment link-hover" data-dismiss="modal">
+                        <i class="fas fa-times light-icon "></i>
+                    </a>
+                </div>
+                <div class="modal-body">
+                    <input id="objtectToDeleteId" name="objtect_to_delete_id" type="hidden" value="">
+                    <p id="modalDeleteContent" class="mb-0"></p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-outline-danger"
+                        onclick="send_request_to_delete_object();">Delete</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="container">
         <!-- with_categories=true allows to add categories/classes to flash() in .py files -->
         {% with messages = get_flashed_messages(with_categories=true) %}

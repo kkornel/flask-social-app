@@ -53,19 +53,9 @@
                 <div class="dropdown-menu my-drop-menu">
                     <a class="dropdown-item my-drop-menu-item"
                         href="{{ url_for('social.post_update', post_id=post.id) }}">Edit</a>
-                    <span class="my-drop-menu-item-span">
-                        <a class="my-drop-menu-item dropdown-item edit-post link-hover" data-id="">
-                            Edit Modal
-                        </a>
-                    </span>
                     <div class="dropdown-divider"></div>
                     <a class="dropdown-item my-drop-menu-item"
                         href="{{ url_for('social.post_delete', post_id=post.id) }}">Delete</a>
-                    <span class="my-drop-menu-item-span">
-                        <a class="dropdown-item delete-post link-hover my-drop-menu-item" data-id="">
-                            Delete Modal
-                        </a>
-                    </span>
                 </div>
             </div>
             {% endif %}
@@ -78,7 +68,6 @@
                 {% if post.image %}
                 <img class="post-detail-image" src="{{ url_for('static', filename='posts_imgs/' + post.image) }}">
                 {% endif %}
-
                 <div class="post-metadata-text post-metadata-date">
                     {{ post.date_posted.strftime('%I:%M %p · %b %d, %Y') }}
                 </div>
@@ -166,15 +155,15 @@
 
                         {% if current_user.profile == post.author or current_user.profile == comment.author %}
                         <div class="float-right">
-                            {# 
-                            <a class="delete-comment link-hover" data-id="{% url 'comment-delete-modal' comment.pk %}">
+                            <a id="comment_id_{{comment.id}}" class="delete-comment link-hover" data-id="{{comment.id}}"
+                                data-toggle="modal" data-target="#deletePostModal"
+                                onclick="delete_comment_or_post(this, event, 'comment');">
                                 <i class="fas fa-times dark-icon "></i>
                             </a>
-                            #}
-                            <a class="delete-comment link-hover"
+                            <!-- <a class="delete-comment link-hover"
                                 href="{{ url_for('social.comment_delete', post_id=post.id, comment_id=comment.id) }}">
                                 <i class="fas fa-times dark-icon "></i>
-                            </a>
+                            </a> -->
                         </div>
                         {% endif %}
                     </div>
