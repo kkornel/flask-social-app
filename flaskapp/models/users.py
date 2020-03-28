@@ -170,8 +170,7 @@ class User(db.Model, UserMixin):
         return f"User({self.id}, '{self.email}', '{self.username}', '{self.password}')"
 
     def __str__(self):
-        # return f"User({self.id}, '{self.email}', '{self.image}')"
-        return f"User({self.id}, '{self.email}', '{self.username}')"
+        return f"User(#{self.id},  '{self.username}')"
 
 
 followers = db.Table(
@@ -228,13 +227,13 @@ class Profile(db.Model):
                                lazy='dynamic')
 
     def add_image(self, image_data):
-        picture_file_name = save_image(image_data, 'static\profile_imgs',
-                                       (125, 125))
+        picture_file_name = save_image(
+            image_data, app.config['UPLOAD_FOLDER_PROFILE_IMGS'], (125, 125))
         self.image = picture_file_name
 
     def delete_image(self):
         if self.image != 'default.jpg':
-            delete_image('static\profile_imgs', self.image)
+            delete_image(app.config['UPLOAD_FOLDER_PROFILE_IMGS'], self.image)
             self.image = 'default.jpg'
 
     def set_default_image(self):
@@ -268,7 +267,7 @@ class Profile(db.Model):
                         Post.date_posted.desc()).all()
 
     def __str__(self):
-        return f"Profile({self.id}, '{self.user_id}', '{self.user}')"
+        return f"Profile(#{self.id} of {self.user})"
 
 
 # standard decorator style

@@ -82,7 +82,6 @@ def post_create():
 @login_required
 def post_detail(post_id):
     post = Post.query.get_or_404(post_id)
-    app.logger.debug(post.comments)
     form = CommentCreateForm()
     if form.validate_on_submit():
         comment = Comment(post_id=post_id,

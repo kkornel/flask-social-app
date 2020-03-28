@@ -42,7 +42,8 @@
                         <a class="nav-link" href="{{ url_for('social.post_create') }}">New Post</a>
                     </li>
                     <li class="nav-item">
-                        <a class="create-post link-hover nav-item nav-link">New post modal</a>
+                        <a class="create-post link-hover nav-item nav-link" data-toggle="modal"
+                            data-target="#postCreateModal" data-whatever="@mdo">New Post modal</a>
                     </li>
                     {% endif %}
                 </ul>
@@ -73,6 +74,43 @@
             </div>
         </div>
     </nav>
+
+    <div class="modal fade" id="postCreateModal" tabindex="-1" role="dialog" aria-labelledby="postCreateModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content my-modal-content">
+                <div class="modal-header">
+                    <h3 class="modal-title">Add new post</h3>
+                    <a class="delete-comment link-hover" data-dismiss="modal">
+                        <i class="fas fa-times light-icon "></i>
+                    </a>
+                </div>
+                <div class="modal-body">
+                    <form id="formData" method="POST" enctype="multipart/form-data">
+                        <fieldset class="form-group">
+                            <div class="form-group">
+                                <textarea class="form-control" id="content" name="content" placeholder="What&#x27;s up?"
+                                    required rows="8" style="resize:none;"></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-control-label" for="location">Where are you at?</label>
+                                <input class="form-control" id="location" name="location"
+                                    placeholder="Helsinki, Finland" type="text" value="">
+                            </div>
+                            <div class="form-group">
+                                <label for="image">Got any photo?</label>
+                                <input class="form-control-file" id="image" name="image" type="file">
+                            </div>
+                        </fieldset>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">Cancel</button>
+                    <button class="btn purple-btn-outline-modal" type="submit" form="formData">Add</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <div class="modal fade" id="deletePostModal" tabindex="-1" role="dialog" aria-labelledby="deletePostModalLabel"
         aria-hidden="true">

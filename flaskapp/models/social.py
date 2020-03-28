@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from flask import current_app
+from flask import current_app as app
 from flaskapp import db
 
 from flaskapp.utils import delete_image, save_image
@@ -42,20 +42,21 @@ class Post(db.Model):
                             backref=db.backref('likes', lazy=True))
 
     def add_image(self, image_data):
-        picture_file_name = save_image(image_data, 'static\posts_imgs',
+        picture_file_name = save_image(image_data,
+                                       app.config['UPLOAD_FOLDER_POSTS_IMGS'],
                                        (510, 515))
         self.image = picture_file_name
 
     def delete_image(self):
         if self.image:
-            delete_image('static\posts_imgs', self.image)
+            delete_image(app.config['UPLOAD_FOLDER_POSTS_IMGS'], self.image)
             self.image = None
 
     def __repr__(self):
         return f"Post({self.id}, '{self.author_id}', '{self.content}', '{self.location}', '{self.date_posted}', '{self.image}')"
 
     def __str__(self):
-        return f"Post({self.id}, '{self.author}', '{self.content}')"
+        return f"Post(#{self.id})"
 
 
 class Comment(db.Model):
@@ -75,4 +76,4 @@ class Comment(db.Model):
         return f"Comment({self.id}, '{self.post_id}', '{self.author_id}', '{self.content}', '{self.date_commented}')"
 
     def __str__(self):
-        return f"Comment({self.id}, '{self.post}', '{self.author}', '{self.content})"
+        return f"Comment(#{self.id} of {self.post})"

@@ -1,3 +1,35 @@
+var form = document.forms.namedItem("formData");
+form.addEventListener('submit', function (ev) {
+    var oData = new FormData(form);
+    //for (var p of oData) {
+    //    console.log(p);
+    //}
+    $.ajax({
+        url: '/post-create-modal/',
+        type: 'POST',
+        method: 'POST',
+        data: oData,
+        enctype: 'multipart/form-data',
+        cache: false,
+        contentType: false,
+        processData: false,
+        success: function (data) {
+            console.log(data);
+            $('#postCreateModal').modal('hide');
+            // If false, the page will be reloaded from cache, 
+            // if true, from the server,
+            // default value is false.
+            window.location.reload(true);
+        },
+        error: function (data) {
+            console.log(data);
+            $('#postCreateModal').modal('hide');
+            window.location.reload(true);
+        },
+    });
+    ev.preventDefault();
+}, false);
+
 function send_like(event, post_id, profile_id, a_id) {
     const aHrefLike = $('#' + a_id);
     const isLiked = aHrefLike.hasClass('liked');
@@ -61,10 +93,10 @@ function delete_comment_or_post(that, event, what_to_delete) {
     let content = '';
     if (what_to_delete == 'post') {
         title = 'Delete post';
-        content = 'Are you sure you want to this post?';
+        content = 'Are you sure you want to delete this post?';
     } else if (what_to_delete == 'comment') {
         title = 'Delete comment';
-        content = 'Are you sure you want to this comment?';
+        content = 'Are you sure you want to delete this comment?';
     }
     var object_to_delete_id = $(that).data('id');
     console.log(object_to_delete_id)

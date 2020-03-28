@@ -18,6 +18,8 @@ class Config:
     SQLALCHEMY_DATABASE_URI = os.environ.get(
         'MT_FLASK_SQLALCHEMY_DATABASE_URI')
     SQLALCHEMY_TRACK_MODIFICATIONS = False
+    UPLOAD_FOLDER_POSTS_IMGS = 'static\posts_imgs'
+    UPLOAD_FOLDER_PROFILE_IMGS = 'static\profile_imgs',
     MAIL_SERVER = 'smtp.googlemail.com'
     MAIL_PORT = 587
     MAIL_USE_TLS = True

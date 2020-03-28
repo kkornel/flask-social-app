@@ -1,5 +1,6 @@
 import datetime
 import re
+import os
 
 from flask import Blueprint, render_template, request, make_response, current_app as app, Markup, redirect, url_for, session, jsonify
 from flask_login import current_user, login_required
@@ -34,6 +35,22 @@ def home():
     return render_template('home.html',
                            title='Master Thesis Flask',
                            posts=posts)
+
+
+@main.route('/post-create-modal/', methods=['POST'])
+def post_create_modal():
+    if request.method == 'POST':
+        content = request.form['content']
+        location = request.form['location']
+        image = request.files['image']
+        author = current_user.profile
+        post = Post(author_id=author.id, content=content, location=location)
+        if image:
+            post.add_image(image)
+        db.session.add(post)
+        db.session.commit()
+        return jsonify({'success': 'true'})
+    return jsonify({'error': 'GET method'})
 
 
 @main.route('/delete_comment_or_post/', methods=['POST'])

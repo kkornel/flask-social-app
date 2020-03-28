@@ -39,12 +39,6 @@
                         <div class="dropdown-menu my-drop-menu" aria-labelledby="dropdownMenuLink">
                             <a class="dropdown-item my-drop-menu-item"
                                 href="{{ url_for('social.post_update', post_id=post.id) }}">Edit</a>
-                            <span class="my-drop-menu-item-span">
-                                <a class="my-drop-menu-item dropdown-item edit-post link-hover"
-                                    onclick="stopPropagation(event);" data-id="">
-                                    Edit Modal
-                                </a>
-                            </span>
                             <div class="dropdown-divider"></div>
                             <a class="dropdown-item my-drop-menu-item"
                                 href="{{ url_for('social.post_delete', post_id=post.id) }}">Delete</a>
