@@ -5,6 +5,57 @@
 <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='followers.css') }}">
 {% endblock stylesheets %}
 
+
+{% block scripts %}
+<script>
+    function delete_comment_or_post(that, event, what_to_delete) {
+        console.log(what_to_delete);
+        let title = '';
+        let content = '';
+        if (what_to_delete == 'post') {
+            title = 'Delete post';
+            content = 'Are you sure you want to this post?';
+        } else if (what_to_delete == 'comment') {
+            title = 'Delete comment';
+            content = 'Are you sure you want to this comment?';
+        }
+        var object_to_delete_id = $(that).data('id');
+        console.log(object_to_delete_id)
+        $('#modalDeleteTitle').text(title);
+        $('#modalDeleteContent').text(content);
+        $('#deletePostModal').modal('show');
+        $(".modal-body #objtectToDeleteId").val(what_to_delete + '-' + object_to_delete_id);
+        stopPropagation(event);
+    };
+
+    function send_request_to_delete_object() {
+        var object_to_delete_id = $(".modal-body #objtectToDeleteId").val();
+        console.log(object_to_delete_id);
+
+        $.ajax({
+            url: '/delete_comment_or_post/',
+            type: 'POST',
+            data: {
+                'object_to_delete_id': object_to_delete_id,
+            },
+            success: function (data) {
+                console.log(data);
+                $('#deletePostModal').modal('hide');
+                window.location.reload();
+            },
+            error: function (data) {
+                console.log(data);
+                $('#deletePostModal').modal('hide');
+                window.location.reload();
+            },
+        });
+    };
+
+
+</script>
+{% endblock scripts %}
+
+
 {% block content_center %}
 <div class="modal fade" id="followedModal" tabindex="-1" role="dialog" aria-labelledby="followedModalTitle"
     aria-hidden="true">
@@ -128,6 +179,29 @@
             <div class="modal-footer">
                 <button type="button" class="btn btn-outline-secondary" onClick="window.location.reload();"
                     data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="deletePostModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content my-modal-content">
+            <div class="modal-header">
+                <h4 id="modalDeleteTitle" class="modal-title">Delete's comment?</h4>
+                <a class="delete-comment link-hover" data-dismiss="modal">
+                    <i class="fas fa-times light-icon "></i>
+                </a>
+            </div>
+            <div class="modal-body">
+                <input id="objtectToDeleteId" name="objtect_to_delete_id" type="hidden" value="">
+                <p id="modalDeleteContent" class="mb-0"></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">Cancel</button>
+                <button type="submit" class="btn btn-outline-danger"
+                    onclick="send_request_to_delete_object();">Delete</button>
             </div>
         </div>
     </div>
@@ -306,9 +380,13 @@
                             <a class="dropdown-item my-drop-menu-item"
                                 href="{{ url_for('social.post_delete', post_id=post.id) }}">Delete</a>
                             <span class="my-drop-menu-item-span">
-                                <a class="dropdown-item delete-post link-hover my-drop-menu-item">
-                                    {# data-id="{% url 'post-delete-modal' post.pk %}" onclick="stopPropagation(event);">#}
+                                <a id="post_id_{{post.id}}"
+                                    class="dropdown-item delete-post link-hover my-drop-menu-item" data-id="{{post.id}}"
+                                    data-toggle="modal" data-target="#deletePostModal"
+                                    onclick="delete_comment_or_post(this, event, 'post');">
+                                    {#data-id="{{ url_for('main.test')}}" onclick="stopPropagation(event);">#}
                                     Delete Modal
+                                </a>
                                 </a>
                             </span>
                         </div>

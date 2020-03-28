@@ -1,10 +1,10 @@
 import datetime
 import re
 
-from flask import Blueprint, render_template, request, make_response, current_app as app, Markup, redirect, url_for, session
-
+from flask import Blueprint, render_template, request, make_response, current_app as app, Markup, redirect, url_for, session, jsonify
 from flask_login import current_user, login_required
 
+from flaskapp import db
 from flaskapp.utils import generate_hashtag_link, generate_link
 from flaskapp.models.social import Post, Comment
 from flaskapp.models.users import Profile, User
@@ -34,6 +34,29 @@ def home():
     return render_template('home.html',
                            title='Master Thesis Flask',
                            posts=posts)
+
+
+@main.route('/delete_comment_or_post/', methods=['POST'])
+def delete_comment_or_post():
+    if request.method == 'POST':
+        object_to_delete_id = request.form['object_to_delete_id']
+        app.logger.debug(object_to_delete_id)
+        what_to_delete, object_id = object_to_delete_id.split('-')
+        app.logger.debug(what_to_delete)
+        app.logger.debug(object_id)
+
+        if what_to_delete == 'post':
+            object_to_delete = Post.query.get(object_id)
+
+        elif what_to_delete == 'comment':
+            object_to_delete = Comment.query.get(object_id)
+
+        app.logger.debug(object_to_delete)
+        db.session.delete(object_to_delete)
+        db.session.commit()
+
+        return jsonify({'success': 'true'})
+    return jsonify({'error': 'GET method'})
 
 
 @main.route('/search/', methods=['POST'])
