@@ -6,6 +6,7 @@ from flask_bcrypt import Bcrypt
 from flask_login import LoginManager
 from flask_sqlalchemy import SQLAlchemy
 from flask_mail import Mail
+from flask_marshmallow import Marshmallow
 
 from flaskapp.config import Config
 
@@ -63,6 +64,8 @@ login_manager = LoginManager()
 mail = Mail()
 # mail = Mail(app)
 
+ma = Marshmallow()
+
 # It tells the login_manager where is login route.
 # @login_required needs to know where to redirect user
 # if he is not logged in.
@@ -111,16 +114,19 @@ def create_app(config_class=Config):
     bcrypt.init_app(app)
     login_manager.init_app(app)
     mail.init_app(app)
+    ma.init_app(app)
 
     from flaskapp.main.routes import main
     from flaskapp.users.routes import users
     from flaskapp.social.routes import social
     from flaskapp.errors.handlers import errors
+    from flaskapp.api.routes import api
 
     app.register_blueprint(main)
     app.register_blueprint(users)
     app.register_blueprint(social)
     app.register_blueprint(errors)
+    app.register_blueprint(api)
 
     log = logging.getLogger('werkzeug')
     log.setLevel(logging.WARNING)
