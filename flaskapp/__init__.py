@@ -120,13 +120,13 @@ def create_app(config_class=Config):
     from flaskapp.users.routes import users
     from flaskapp.social.routes import social
     from flaskapp.errors.handlers import errors
-    from flaskapp.api.routes import api
+    from flaskapp.api.routes import api_bp
 
     app.register_blueprint(main)
     app.register_blueprint(users)
     app.register_blueprint(social)
     app.register_blueprint(errors)
-    app.register_blueprint(api)
+    app.register_blueprint(api_bp)
 
     log = logging.getLogger('werkzeug')
     log.setLevel(logging.WARNING)
