@@ -117,12 +117,15 @@
                     src="{{ url_for('static', filename='profiles_imgs/' + result.profile.image) }}">
             </a>
             <div class="media-body">
-                <div class="pt-2">
+                <div class="pt-0">
                     <h2 class="account-heading">
                         <a class="follower-author-name" href="{{ url_for('users.profile', username=result.username) }}">
                             {{ result.username }}
                         </a>
                     </h2>
+                </div>
+                <div>
+                    {{ result.profile.bio|render_tags_and_links }}
                 </div>
             </div>
             {% if current_user.is_authenticated and current_user.profile != result.profile %}

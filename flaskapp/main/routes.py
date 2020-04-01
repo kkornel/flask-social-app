@@ -76,7 +76,26 @@ def delete_comment_or_post():
     return jsonify({'error': 'GET method'})
 
 
-@main.route('/search/', methods=['POST'])
+@main.route('/tags/<string:tag>/')
+def search_tags(tag):
+    results = []
+    query = "%{}%".format(tag)
+    profiles = Profile.query.filter(Profile.bio.ilike(query)).distinct(
+        Profile.id).all()
+
+    for profile in profiles:
+        results.append(profile.user)
+    posts = Post.query.filter(
+        Post.content.ilike(query) | Post.location.ilike(query)).distinct(
+            Post.id).all()
+    for post in posts:
+        results.append(post)
+    return render_template('search.html',
+                           title=f'{tag}',
+                           results=list(set(results)))
+
+
+@main.route('/search/')
 def search():
     results = []
     query = request.form['q']
