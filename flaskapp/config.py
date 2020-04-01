@@ -19,7 +19,7 @@ class Config:
         'MT_FLASK_SQLALCHEMY_DATABASE_URI')
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     UPLOAD_FOLDER_POSTS_IMGS = 'static\posts_imgs'
-    UPLOAD_FOLDER_PROFILE_IMGS = 'static\profiles_imgs',
+    UPLOAD_FOLDER_PROFILES_IMGS = 'static\profiles_imgs',
     MAIL_SERVER = 'smtp.googlemail.com'
     MAIL_PORT = 587
     MAIL_USE_TLS = True

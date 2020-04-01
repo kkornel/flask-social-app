@@ -227,13 +227,16 @@ class Profile(db.Model):
                                lazy='dynamic')
 
     def add_image(self, image_data):
+        app.logger.debug(self.image)
         picture_file_name = save_image(
-            image_data, app.config['UPLOAD_FOLDER_PROFILE_IMGS'], (125, 125))
+            image_data, app.config['UPLOAD_FOLDER_PROFILES_IMGS'][0],
+            (125, 125))
         self.image = picture_file_name
 
     def delete_image(self):
         if self.image != 'default.jpg':
-            delete_image(app.config['UPLOAD_FOLDER_PROFILE_IMGS'], self.image)
+            delete_image(app.config['UPLOAD_FOLDER_PROFILES_IMGS'][0],
+                         self.image)
             self.image = 'default.jpg'
 
     def set_default_image(self):

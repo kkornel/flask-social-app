@@ -21,7 +21,7 @@
             <span class="author-img-sm-span">
                 <a href="{{ url_for('users.profile', username=post.author.user.username) }}">
                     <img class="rounded-circle author-img-sm"
-                        src="{{ url_for('static', filename='profile_imgs/' + post.author.image) }}">
+                        src="{{ url_for('static', filename='profiles_imgs/' + post.author.image) }}">
                 </a>
             </span>
 
@@ -132,7 +132,7 @@
                 <span class="comment-author-img-sm-span">
                     <a href="{{ url_for('users.profile', username=post.author.user.username) }}">
                         <img class="rounded-circle author-img-sm"
-                            src="{{ url_for('static', filename='profile_imgs/' + comment.author.image) }}">
+                            src="{{ url_for('static', filename='profiles_imgs/' + comment.author.image) }}">
                     </a>
                 </span>
                 <div class="media-body">
