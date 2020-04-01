@@ -349,6 +349,24 @@ a.nav-back-span-a:hover {
   color: #ffffff !important;
 }
 
+
+.search-header {
+  font-weight: bold;
+  margin-top: 16px;
+  margin-left: 16px;
+  font-size: 18px;
+}
+
+.no-results {
+  margin-top: 32px;
+  margin-bottom: 32px;
+  font-style: italic;
+}
+
+.no-results > p {
+  margin-bottom: 0px;
+}
+
 /* Icon Wobble Horizontal */
 @-webkit-keyframes hvr-icon-wobble-horizontal {
   16.65% {
