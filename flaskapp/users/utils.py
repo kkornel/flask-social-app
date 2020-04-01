@@ -41,8 +41,8 @@ def check_password_strength(password):
                        or lowercase_error or symbol_error)
 
     # TODO uncomment later
-    # return password_ok
-    return True
+    return password_ok
+    # return True
 
 
 def send_email(to, subject, template):

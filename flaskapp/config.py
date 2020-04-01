@@ -36,3 +36,10 @@ class Config:
 
 class DevelopmentConfig(Config):
     DEBUG = True
+
+
+class TestConfig(DevelopmentConfig):
+    TESTING = True
+    WTF_CSRF_ENABLED = False
+    SQLALCHEMY_DATABASE_URI = 'sqlite:///tests.db'
+    PRESERVE_CONTEXT_ON_EXCEPTION = False

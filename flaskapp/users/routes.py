@@ -94,7 +94,7 @@ def login():
             # http://127.0.0.1:5000/login?next=%2Faccount
             # Here we are getting that parameter and redirecting user to that page.
             next_page = request.args.get('next')
-            current_app.logger.info('Next page parameter: %s', next_page)
+            # current_app.logger.info('Next page parameter: %s', next_page)
             return redirect(next_page) if next_page else redirect(
                 url_for('main.home'))
         else:
