@@ -40,11 +40,11 @@
                 {% set is_following = is_already_following(current_user.profile.id, result.profile.id) %}
 
                 {% if is_following %}
-                <a id="followers-btn-modal-{{result.profile.id}}" class="link-hover btn purple-btn-outline-modal"
-                    onclick="follow_user(event, '{{current_user.profile.id}}', '{{result.profile.id}}', true, this.id);">Following</a>
+                <a id="followers-btn-modal-{{result.profile.id}}" class="link-hover btn purple-btn-outline"
+                    onclick="follow_user(event, '{{current_user.profile.id}}', '{{result.profile.id}}', false, this.id);">Following</a>
                 {% else %}
                 <a id="followers-btn-modal-{{result.profile.id}}" class="link-hover btn purple-btn"
-                    onclick="follow_user(event, '{{current_user.profile.id}}', '{{result.profile.id}}', true, this.id);">Follow</a>
+                    onclick="follow_user(event, '{{current_user.profile.id}}', '{{result.profile.id}}', false, this.id);">Follow</a>
                 {% endif %}
             </div>
             {% endif %}

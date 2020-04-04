@@ -40,6 +40,7 @@ def home():
 
 
 @main.route('/post-create-modal/', methods=['POST'])
+@login_required
 def post_create_modal():
     if request.method == 'POST':
         content = request.form['content']
@@ -56,6 +57,7 @@ def post_create_modal():
 
 
 @main.route('/delete_comment_or_post/', methods=['POST'])
+@login_required
 def delete_comment_or_post():
     if request.method == 'POST':
         object_to_delete_id = request.form['object_to_delete_id']
@@ -79,6 +81,7 @@ def delete_comment_or_post():
 
 
 @main.route('/tags/<string:tag>/')
+@login_required
 def search_tags(tag):
     users_results = []
     posts_results = []
@@ -99,6 +102,7 @@ def search_tags(tag):
 
 
 @main.route('/search/', methods=['POST'])
+@login_required
 def search():
     users_results = []
     posts_results = []

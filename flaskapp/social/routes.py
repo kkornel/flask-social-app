@@ -16,7 +16,7 @@ social = Blueprint('social', __name__)
 
 
 @social.route('/like/', methods=['POST'])
-def like():
+def like_post():
     if request.method == 'POST':
         post_id = request.form['post_id']
         profile_id = request.form['profile_id']
@@ -37,7 +37,7 @@ def like():
 
 
 @social.route('/follow/', methods=['POST'])
-def follow():
+def follow_user():
     if request.method == 'POST':
         follower_id = request.form['follower_id']
         followed_id = request.form['followed_id']
