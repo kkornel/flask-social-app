@@ -31,7 +31,9 @@ def home():
     # return response
     # posts = Post.query.order_by(Post.date_posted.desc())
     posts = current_user.profile.user_and_followed_posts()
-
+    # app.logger.debug(posts)
+    if not posts:
+        posts = current_user.profile.user_posts()
     return render_template('home.html',
                            title='Master Thesis Flask',
                            posts=posts)

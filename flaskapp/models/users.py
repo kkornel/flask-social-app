@@ -273,6 +273,10 @@ class Profile(db.Model):
                     Post.author_id == self.id)).order_by(
                         Post.date_posted.desc()).all()
 
+    def user_posts(self):
+        return Post.query.filter_by(author_id=self.id).order_by(
+            Post.date_posted.desc()).all()
+
     def __str__(self):
         return f"Profile(#{self.id} of {self.user})"
 
