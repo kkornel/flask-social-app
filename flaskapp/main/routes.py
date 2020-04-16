@@ -26,7 +26,7 @@ main = Blueprint('main', __name__)
 @login_required
 def home():
     response = make_response(
-        render_template('home.html', title='Master Thesis Flask'))
+        render_template('home.html', title='Flask app - Home'))
     response.headers['Content-Security-Policy'] = "default-src 'self'"
     # return response
     # posts = Post.query.order_by(Post.date_posted.desc())
@@ -34,9 +34,7 @@ def home():
     # app.logger.debug(posts)
     if not posts:
         posts = current_user.profile.user_posts()
-    return render_template('home.html',
-                           title='Master Thesis Flask',
-                           posts=posts)
+    return render_template('home.html', title='Flask app - Home', posts=posts)
 
 
 @main.route('/post-create-modal/', methods=['POST'])
