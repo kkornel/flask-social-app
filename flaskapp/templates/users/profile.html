@@ -23,7 +23,7 @@
                         <span class="follower-img-sm-span">
                             <a href="{{ url_for('users.profile', username=follow.user.username) }}">
                                 <img class="rounded-circle follower-img-sm"
-                                    src="{{ url_for('static', filename='profile_imgs/' + follow.image) }}">
+                                    src="{{ url_for('static', filename='profiles_imgs/' + follow.image) }}">
                             </a>
                         </span>
                         <div class="media-body">
@@ -86,7 +86,7 @@
                         <span class="follower-img-sm-span">
                             <a href="{{ url_for('users.profile', username=follow.user.username) }}">
                                 <img class="rounded-circle follower-img-sm"
-                                    src="{{ url_for('static', filename='profile_imgs/' + follow.image) }}">
+                                    src="{{ url_for('static', filename='profiles_imgs/' + follow.image) }}">
                             </a>
                         </span>
                         <div class="media-body">
@@ -112,10 +112,8 @@
                                 <a id="followers-btn-modal-{{follow.id}}" class="link-hover btn purple-btn"
                                     onclick="follow_user(event, '{{current_user.profile.id}}', '{{follow.id}}', true, this.id);">Follow</a>
                                 {% endif %}
-                                </a>
                             </div>
                             {% endif %}
-                            </a>
                         </div>
                     </article>
                 </div>
@@ -146,7 +144,7 @@
     </div>
     <div class="pl-3 pr-3 mt-2">
         <div class="media my-media">
-            <img class="profile-img" src="{{ url_for('static', filename='profile_imgs/' + profile.image) }}">
+            <img class="profile-img" src="{{ url_for('static', filename='profiles_imgs/' + profile.image) }}">
             {% if current_user.profile == profile %}
             <div>
                 <div class="dropdown my-dropdown">
@@ -227,7 +225,7 @@
                 </div>
             </div>
 
-            <p class="mb-1">{{ profile.bio|render_tags_and_links }}</p>
+            <p class="mt-2 mb-3">{{ profile.bio|render_tags_and_links }}</p>
 
             <div class="row content-between mr-0 ml-0 mb-0 mt-2">
                 {% if profile.city %}
@@ -270,7 +268,7 @@
         <article class="media my-post">
             <a href="{{ url_for('users.profile', username=post.author.user.username) }}">
                 <img class="rounded-circle post-author-img"
-                    src="{{ url_for('static', filename='profile_imgs/' + post.author.image) }}">
+                    src="{{ url_for('static', filename='profiles_imgs/' + post.author.image) }}">
             </a>
             <div class="media-body">
                 <div class="post-metadata">

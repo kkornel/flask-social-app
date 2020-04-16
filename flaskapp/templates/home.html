@@ -9,7 +9,7 @@
         <article class="media my-post">
             <a href="{{ url_for('users.profile', username=post.author.user.username) }}">
                 <img class="rounded-circle post-author-img"
-                    src="{{ url_for('static', filename='profile_imgs/' + post.author.image) }}">
+                    src="{{ url_for('static', filename='profiles_imgs/' + post.author.image) }}">
             </a>
             <div class="media-body">
                 <div class="post-metadata">

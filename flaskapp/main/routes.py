@@ -26,18 +26,19 @@ main = Blueprint('main', __name__)
 @login_required
 def home():
     response = make_response(
-        render_template('home.html', title='Master Thesis Flask'))
+        render_template('home.html', title='Flask app - Home'))
     response.headers['Content-Security-Policy'] = "default-src 'self'"
     # return response
     # posts = Post.query.order_by(Post.date_posted.desc())
     posts = current_user.profile.user_and_followed_posts()
-
-    return render_template('home.html',
-                           title='Master Thesis Flask',
-                           posts=posts)
+    # app.logger.debug(posts)
+    if not posts:
+        posts = current_user.profile.user_posts()
+    return render_template('home.html', title='Flask app - Home', posts=posts)
 
 
 @main.route('/post-create-modal/', methods=['POST'])
+@login_required
 def post_create_modal():
     if request.method == 'POST':
         content = request.form['content']
@@ -54,6 +55,7 @@ def post_create_modal():
 
 
 @main.route('/delete_comment_or_post/', methods=['POST'])
+@login_required
 def delete_comment_or_post():
     if request.method == 'POST':
         object_to_delete_id = request.form['object_to_delete_id']
@@ -76,9 +78,32 @@ def delete_comment_or_post():
     return jsonify({'error': 'GET method'})
 
 
+@main.route('/tags/<string:tag>/')
+@login_required
+def search_tags(tag):
+    users_results = []
+    posts_results = []
+    query = "%#{}%".format(tag)
+    profiles = Profile.query.filter(Profile.bio.ilike(query)).distinct(
+        Profile.id).all()
+    for profile in profiles:
+        users_results.append(profile.user)
+    posts = Post.query.filter(
+        Post.content.ilike(query) | Post.location.ilike(query)).distinct(
+            Post.id).all()
+    for post in posts:
+        posts_results.append(post)
+    return render_template('search.html',
+                           title=f'#{tag}',
+                           users=list(set(users_results)),
+                           posts=list(set(posts_results)))
+
+
 @main.route('/search/', methods=['POST'])
+@login_required
 def search():
-    results = []
+    users_results = []
+    posts_results = []
     query = request.form['q']
     queries = query.split(' ')
     for q in queries:
@@ -86,15 +111,20 @@ def search():
         users = User.query.filter(User.username.ilike(q)).distinct(
             User.username).all()
         for user in users:
-            results.append(user)
+            users_results.append(user)
+        profiles = Profile.query.filter(Profile.bio.ilike(q)).distinct(
+            Profile.id).all()
+        for profile in profiles:
+            users_results.append(profile.user)
         posts = Post.query.filter(
             Post.content.ilike(q) | Post.location.ilike(q)).distinct(
                 Post.id).all()
         for post in posts:
-            results.append(post)
+            posts_results.append(post)
     return render_template('search.html',
                            title=f'Search {query}',
-                           results=list(set(results)))
+                           users=list(set(users_results)),
+                           posts=list(set(posts_results)))
 
 
 @main.app_template_filter('render_tags_and_links')

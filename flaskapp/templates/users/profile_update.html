@@ -4,7 +4,7 @@
 <div class="col-sm-7 mt-3 block-content-borders">
     <div class="media">
         <img class="rounded-circle account-img"
-            src="{{ url_for('static', filename='profile_imgs/' + current_user.profile.image) }}">
+            src="{{ url_for('static', filename='profiles_imgs/' + current_user.profile.image) }}">
         <div class="media-body ml-4 mt-2">
             <h2 class="account-heading">{{ current_user.username }}</h2>
             <p class="text-secondary">{{ current_user.email }}</p>
@@ -102,7 +102,7 @@
 {% block content %}
 <div class="col-sm-7 offset-sm-3 mt-3 block-content-borders">
     <div class="media">
-        <img class="rounded-circle account-img" src="{{ url_for('static', filename='profile_imgs/' + current_user.profile.image) }}">
+        <img class="rounded-circle account-img" src="{{ url_for('static', filename='profiles_imgs/' + current_user.profile.image) }}">
         <div class="media-body">
             <h2 class="account-heading">{{ current_user.username }}</h2>
             <p class="text-secondary">{{ current_user.email }}</p>

@@ -135,6 +135,7 @@ def create_app(config_class=Config):
 
     with app.app_context():
         db.create_all()
-        app.add_url_rule('/new2', view_func=MyView.as_view('myview'))
+        # Used for Plugable View
+        # app.add_url_rule('/new2', view_func=MyView.as_view('myview'))
 
     return app

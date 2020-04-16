@@ -23,7 +23,7 @@
     {% if title %}
     <title>{{ title }}</title>
     {% else %}
-    <title>Flask - Master Thesis</title>
+    <title>Flask App</title>
     {% endif %}
 </head>
 
@@ -143,6 +143,12 @@
         <div class="col-sm-6 offset-sm-3 pt-0 pl-0 pr-0">
             <div class=" alert alert-{{ category }}" role="alert">
                 {{ message }}
+            </div>
+        </div>
+        <div class='row content-center'>
+
+            <div class="col-md-7 pl-0 pr-0">
+                <div class="my-horizontal-bar-thin"></div>
             </div>
         </div>
         {% endfor %}
