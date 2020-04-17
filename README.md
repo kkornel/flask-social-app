@@ -2,9 +2,9 @@
 
 Social networking app providing the microblogging service.
 
-### Sidenote
+## Sidenote
 
-This is a recreated version of <i>django-social-app</i> in Flask. <br>
+This is a recreated version of [django-social-app](https://github.com/kkornel/django-social-app "Github page of Django social app") in Flask. <br>
 It offers exact the same functionality as the original app, but uses other framework. <br>
 Created for learning purpose and to see how things are done differently in this solution.
 
