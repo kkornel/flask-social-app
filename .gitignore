@@ -1,6 +1,7 @@
 profiles_imgs/
 posts_imgs/
 fontawesome/
+.env
 
 tests.db
 
