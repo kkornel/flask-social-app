@@ -21,4 +21,4 @@ Also:
 
 Don't wait. Join now at:
 
-...
+Comming soon on Heroku and PythonAnywhere!
